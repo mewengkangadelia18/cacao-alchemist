@@ -1,0 +1,2612 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cacao Alchemist: Fermentasi &amp; Belahan Biji Virtual (Cut Test)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap');
+
+  :root {
+    --w1: #965a2b;
+    --w2: #47250d;
+    --w-border: #261104;
+    --gold: #ffcf40;
+    --cream: #fff8eb;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    user-select: none;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    font-family: 'Nunito', sans-serif;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(92, 168, 56, 0.22) 0%, transparent 45%),
+      radial-gradient(circle at 80% 85%, rgba(255, 196, 64, 0.14) 0%, transparent 50%),
+      radial-gradient(ellipse at center, #1d3611 0%, #0b1606 100%);
+    color: #ffffff;
+  }
+
+  h1, h2, h3, h4, .font-title {
+    font-family: 'Fredoka', sans-serif;
+  }
+
+  /* Kontainer Panggung Diorama Utama */
+  #app {
+    position: relative;
+    isolation: isolate;
+    box-shadow:
+      0 28px 65px rgba(0, 0, 0, 0.78),
+      0 10px 0 #1f0e03,
+      inset 0 2px 1px rgba(255, 255, 255, 0.35),
+      inset 0 -4px 14px rgba(0, 0, 0, 0.45);
+    transition: background 0.6s ease;
+  }
+
+  /* Lapisan Partikel Cahaya Hangat / Serbuk Sari Melayang (Ambient Floating Particles) */
+  #app::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(circle at 12% 24%, rgba(255, 244, 184, 0.45) 0 2.5px, transparent 3.5px),
+      radial-gradient(circle at 28% 76%, rgba(255, 232, 145, 0.35) 0 2px, transparent 3px),
+      radial-gradient(circle at 46% 18%, rgba(255, 255, 255, 0.42) 0 2px, transparent 3px),
+      radial-gradient(circle at 67% 64%, rgba(255, 224, 130, 0.38) 0 3px, transparent 4px),
+      radial-gradient(circle at 84% 28%, rgba(255, 248, 200, 0.48) 0 2.2px, transparent 3.2px),
+      radial-gradient(circle at 91% 82%, rgba(255, 214, 102, 0.32) 0 2.5px, transparent 3.5px),
+      radial-gradient(circle at 54% 48%, rgba(255, 250, 220, 0.3) 0 1.8px, transparent 2.8px);
+    background-size: 420px 360px;
+    animation: ambientFloat 16s linear infinite;
+  }
+
+  /* Vignette & Pencahayaan Ruangan Berlapis */
+  #app::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255, 248, 220, 0.18) 0%, transparent 55%),
+      radial-gradient(ellipse at center, transparent 58%, rgba(12, 6, 2, 0.42) 100%);
+  }
+
+  #screen {
+    position: relative;
+    z-index: 1;
+  }
+
+  @keyframes ambientFloat {
+    0% {
+      transform: translateY(0px) translateX(0px);
+      opacity: 0.72;
+    }
+    50% {
+      transform: translateY(-18px) translateX(10px);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-36px) translateX(0px);
+      opacity: 0.72;
+    }
+  }
+
+  /* Latar Belakang Pemandangan dengan Pencahayaan Berlapis */
+  .bg-tropical {
+    background:
+      radial-gradient(circle at 82% 14%, rgba(255, 251, 205, 0.85) 0%, rgba(255, 236, 153, 0.25) 14%, transparent 34%),
+      radial-gradient(ellipse at 50% 34%, rgba(255, 255, 255, 0.28) 0%, transparent 60%),
+      linear-gradient(180deg, #47b5ff 0%, #a8e2ff 34%, #5aa641 34%, #387324 68%, #1c3d10 100%);
+  }
+  .bg-shed {
+    background:
+      radial-gradient(circle at 50% 8%, rgba(255, 235, 185, 0.45) 0%, transparent 48%),
+      repeating-linear-gradient(90deg, rgba(40, 18, 4, 0.06) 0px, rgba(40, 18, 4, 0.06) 2px, transparent 2px, transparent 48px),
+      radial-gradient(circle at 50% 24%, #ebd09e 0%, #9e6b36 58%, #47280e 100%);
+  }
+  .bg-lab {
+    background:
+      radial-gradient(circle at 50% 6%, rgba(255, 252, 240, 0.65) 0%, transparent 50%),
+      radial-gradient(circle at 20% 30%, rgba(255, 238, 200, 0.28) 0%, transparent 45%),
+      radial-gradient(circle at 50% 25%, #fbf1df 0%, #cfa97a 65%, #694420 100%);
+  }
+
+  /* Panel Kayu 3D & Perkamen dengan Kedalaman Realistis */
+  .wood-panel {
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(255, 224, 175, 0.14) 0%, transparent 28%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 7px),
+      linear-gradient(180deg, var(--w1), var(--w2));
+    border: 3px solid var(--w-border);
+    border-radius: 16px;
+    box-shadow:
+      0 7px 0 #1a0b02,
+      0 14px 24px rgba(0, 0, 0, 0.45),
+      inset 0 2px 1px rgba(255, 238, 198, 0.34),
+      inset 0 -3px 6px rgba(15, 6, 1, 0.55);
+  }
+
+  .parchment {
+    position: relative;
+    background:
+      radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.65) 0%, transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(217, 179, 130, 0.28) 0%, transparent 50%),
+      linear-gradient(180deg, #fffef9 0%, #f5e2c3 100%);
+    color: #3b1e08;
+    border: 3px solid #5e3616;
+    border-radius: 16px;
+    box-shadow:
+      0 7px 0 #2b1506,
+      0 15px 28px rgba(0, 0, 0, 0.36),
+      inset 0 2px 2px rgba(255, 255, 255, 0.9),
+      inset 0 -4px 12px rgba(138, 86, 38, 0.18);
+  }
+
+  .cut-board {
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(255, 224, 180, 0.16) 0%, transparent 18%),
+      repeating-linear-gradient(90deg, #ae703e 0px, #ae703e 36px, #875026 36px, #875026 39px);
+    border: 4px solid #381c08;
+    border-radius: 18px;
+    box-shadow:
+      inset 0 5px 14px rgba(0, 0, 0, 0.48),
+      inset 0 -3px 8px rgba(255, 215, 160, 0.15),
+      0 8px 0 #210f03,
+      0 16px 28px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Tombol 3D Taktil dengan Kilau Cahaya Melintas (Sheen Sweep) */
+  .btn-3d {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.18s ease, box-shadow 0.15s ease;
+    border-radius: 9999px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-3d::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -75%;
+    width: 50%;
+    height: 200%;
+    background: linear-gradient(
+      105deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.42) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(18deg);
+    transition: left 0.55s ease;
+    pointer-events: none;
+  }
+  .btn-3d:hover:not(:disabled)::after {
+    left: 135%;
+  }
+  .btn-3d:hover:not(:disabled) {
+    filter: brightness(1.07);
+    transform: translateY(-2px);
+  }
+  .btn-3d:active:not(:disabled) {
+    transform: translateY(4px) scale(0.985);
+  }
+  .btn-3d:disabled {
+    opacity: 0.52;
+    cursor: not-allowed;
+  }
+
+  .btn-green {
+    background: linear-gradient(180deg, #6ee657 0%, #248524 100%);
+    border: 2.5px solid #124712;
+    box-shadow: 0 5px 0 #0e360e, 0 8px 14px rgba(0, 0, 0, 0.3), inset 0 2px 1px rgba(255,255,255,0.45);
+    color: #fff;
+    text-shadow: 0 1.5px 0 rgba(0,0,0,0.45);
+  }
+  .btn-green:active:not(:disabled) {
+    box-shadow: 0 1px 0 #0e360e, inset 0 2px 4px rgba(0,0,0,0.35);
+  }
+
+  .btn-gold {
+    background: linear-gradient(180deg, #ffe77a 0%, #de9309 100%);
+    border: 2.5px solid #6b4400;
+    box-shadow: 0 5px 0 #4a2f00, 0 8px 14px rgba(0, 0, 0, 0.3), inset 0 2px 1px rgba(255,255,255,0.6);
+    color: #422005;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+  }
+  .btn-gold:active:not(:disabled) {
+    box-shadow: 0 1px 0 #4a2f00, inset 0 2px 4px rgba(0,0,0,0.25);
+  }
+
+  .btn-blue {
+    background: linear-gradient(180deg, #63bdff 0%, #1a64c7 100%);
+    border: 2.5px solid #0c3570;
+    box-shadow: 0 5px 0 #08224a, 0 8px 14px rgba(0, 0, 0, 0.3), inset 0 2px 1px rgba(255,255,255,0.45);
+    color: #fff;
+    text-shadow: 0 1.5px 0 rgba(0,0,0,0.4);
+  }
+  .btn-blue:active:not(:disabled) {
+    box-shadow: 0 1px 0 #08224a, inset 0 2px 4px rgba(0,0,0,0.35);
+  }
+
+  .btn-wood {
+    background: linear-gradient(180deg, #a66532 0%, #522a0e 100%);
+    border: 2.5px solid #241003;
+    box-shadow: 0 5px 0 #170901, 0 8px 14px rgba(0, 0, 0, 0.32), inset 0 2px 1px rgba(255,235,195,0.28);
+    color: #ffe8a3;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+  }
+  .btn-wood:active:not(:disabled) {
+    box-shadow: 0 1px 0 #170901, inset 0 2px 4px rgba(0,0,0,0.4);
+  }
+
+  .btn-red {
+    background: linear-gradient(180deg, #ff7575 0%, #c42323 100%);
+    border: 2.5px solid #610d0d;
+    box-shadow: 0 5px 0 #450909, 0 8px 16px rgba(185, 28, 28, 0.38), inset 0 2px 1px rgba(255,255,255,0.45);
+    color: #fff;
+    text-shadow: 0 1.5px 0 rgba(0,0,0,0.45);
+  }
+  .btn-red:active:not(:disabled) {
+    box-shadow: 0 1px 0 #450909, inset 0 2px 4px rgba(0,0,0,0.4);
+  }
+
+  /* Kartu Interaktif dengan Efek Lift 3D */
+  .card-lift {
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+  }
+  .card-lift:hover {
+    transform: translateY(-4px) scale(1.025);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.32);
+  }
+
+  /* Transisi Masuk Antar-Layar yang Mulus */
+  @keyframes screenFadeSlide {
+    0% {
+      opacity: 0;
+      transform: translateY(8px) scale(0.992);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  .screen-enter {
+    animation: screenFadeSlide 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  /* Animasi Karakter Petani Kakao Hidup (Idle Breathing & Kaca Pembesar) */
+  @keyframes farmerFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(0.8deg); }
+  }
+  @keyframes lensGlint {
+    0%, 70%, 100% { opacity: 0.25; transform: translate(0, 0); }
+    85% { opacity: 0.85; transform: translate(4px, -3px); }
+  }
+  .farmer-idle {
+    transform-origin: 100px 180px;
+    animation: farmerFloat 3.6s ease-in-out infinite;
+  }
+  .lens-glint {
+    animation: lensGlint 3.6s ease-in-out infinite;
+  }
+
+  /* Animasi Uap, Gelombang Panas & Denyut Suhu Kotak Fermentasi */
+  @keyframes steamRise {
+    0% { transform: translateY(2px) scale(0.85); opacity: 0; }
+    25% { opacity: 0.88; }
+    100% { transform: translateY(-28px) scale(1.3); opacity: 0; }
+  }
+  .steam { animation: steamRise 2.2s infinite ease-out; }
+  .steam-2 { animation: steamRise 2.5s infinite ease-out 0.85s; }
+  .steam-3 { animation: steamRise 2.35s infinite ease-out 1.45s; }
+
+  @keyframes heatGlow {
+    0%, 100% { opacity: 0.22; }
+    50% { opacity: 0.48; }
+  }
+  .heat-aura {
+    animation: heatGlow 2.4s ease-in-out infinite;
+  }
+
+  /* Animasi Gerakan Bilah & Gagang Guillotine Turun Membelah */
+  @keyframes guillotineChop {
+    0% { transform: translateY(0px); }
+    32% { transform: translateY(58px); }
+    48% { transform: translateY(54px); }
+    85% { transform: translateY(8px); }
+    100% { transform: translateY(0px); }
+  }
+  .guillotine-chopping {
+    animation: guillotineChop 0.65s cubic-bezier(0.25, 1, 0.35, 1) forwards;
+  }
+
+  /* Getaran Halus Meja Saat Bilah Menghantam Landasan */
+  @keyframes boardImpactShake {
+    0%, 28% { transform: translate(0, 0); }
+    33% { transform: translate(0, 3px); }
+    39% { transform: translate(-2px, -1px); }
+    45% { transform: translate(2px, 1px); }
+    52% { transform: translate(0, 0); }
+    100% { transform: translate(0, 0); }
+  }
+  .board-shake {
+    animation: boardImpactShake 0.65s ease-out forwards;
+  }
+
+  /* Animasi Kilatan Potongan & Percikan Partikel Cahaya */
+  @keyframes slashFlash {
+    0%, 24% { opacity: 0; transform: scale(0.6); }
+    36% { opacity: 1; transform: scale(1.22); }
+    75% { opacity: 0.88; transform: scale(1.0); }
+    100% { opacity: 0; transform: scale(0.9); }
+  }
+  .slash-flash-anim {
+    transform-origin: 200px 145px;
+    animation: slashFlash 0.65s ease-out forwards;
+  }
+
+  @keyframes sparkBurstLeft {
+    0%, 28% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+    42% { opacity: 1; transform: translate(-26px, -16px) scale(1.15); }
+    100% { opacity: 0; transform: translate(-42px, -6px) scale(0.3); }
+  }
+  @keyframes sparkBurstRight {
+    0%, 28% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+    42% { opacity: 1; transform: translate(26px, -16px) scale(1.15); }
+    100% { opacity: 0; transform: translate(42px, -6px) scale(0.3); }
+  }
+  .spark-left { animation: sparkBurstLeft 0.65s ease-out forwards; }
+  .spark-right { animation: sparkBurstRight 0.65s ease-out forwards; }
+
+  /* Animasi Belahan Keping Biji Membuka */
+  @keyframes leftHalfOpen {
+    0%, 30% { transform: translate(0px, 0px) rotate(0deg); }
+    55% { transform: translate(-24px, -4px) rotate(-10deg); }
+    100% { transform: translate(-20px, 0px) rotate(-6deg); }
+  }
+  @keyframes rightHalfOpen {
+    0%, 30% { transform: translate(0px, 0px) rotate(0deg); }
+    55% { transform: translate(24px, -4px) rotate(10deg); }
+    100% { transform: translate(20px, 0px) rotate(6deg); }
+  }
+  .half-left-anim {
+    transform-origin: 185px 154px;
+    animation: leftHalfOpen 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  .half-right-anim {
+    transform-origin: 215px 154px;
+    animation: rightHalfOpen 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes popSplit {
+    0% { transform: scale(0.82); }
+    65% { transform: scale(1.07); }
+    100% { transform: scale(1); }
+  }
+  .split-anim {
+    animation: popSplit 0.38s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  @keyframes modalPopIn {
+    0% { transform: scale(0.86) translateY(16px); opacity: 0; }
+    65% { transform: scale(1.02) translateY(-2px); opacity: 1; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  .modal-animate {
+    animation: modalPopIn 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  /* Animasi Buka-Tutup Panel Detail & Contoh Materi Belajar */
+  @keyframes accordionReveal {
+    0% {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.985);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  .accordion-open {
+    animation: accordionReveal 0.26s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .study-clickable {
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .study-clickable:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 18px rgba(45, 22, 6, 0.18);
+  }
+  .study-clickable:active {
+    transform: translateY(0px) scale(0.992);
+  }
+</style>
+</head>
+<body class="p-2 sm:p-4 pb-16 sm:pb-16 flex items-center justify-center">
+
+  <!-- Kontainer Utama Responsif -->
+  <main id="app" class="w-full max-w-[1140px] rounded-2xl overflow-hidden shadow-2xl border-4 border-[#361c08] bg-tropical flex flex-col justify-between min-h-[640px]">
+    <div id="screen" class="w-full flex-1 flex flex-col justify-between p-3 sm:p-5"></div>
+  </main>
+
+  <!-- Tombol Mengambang Info & Kredit di Pojok Kanan Bawah -->
+  <button id="btn-info-credits" aria-label="Buka Informasi dan Kredit Aplikasi" class="btn-3d btn-wood fixed bottom-4 right-4 z-40 px-3.5 py-2 text-xs sm:text-sm border-2 !border-yellow-400/80 shadow-xl hover:scale-105 transition-transform">
+    <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <span class="text-yellow-200 tracking-wide">Info &amp; Kredit</span>
+  </button>
+
+  <!-- Modal Pop-up Informasi & Kredit Aplikasi -->
+  <div id="info-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="info-modal-title" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-opacity duration-200">
+    <div id="info-modal-box" class="parchment modal-animate w-full max-w-md overflow-hidden relative shadow-[0_24px_50px_rgba(0,0,0,0.75),0_8px_0_#2b1506] border-4 border-[#361c08]">
+      <!-- Header Modal Bertema Kayu 3D -->
+      <div class="wood-panel !rounded-none !border-x-0 !border-t-0 !shadow-none px-5 py-3.5 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-yellow-400/20 border border-yellow-300/60 flex items-center justify-center text-yellow-300 shrink-0 shadow-inner">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <h2 id="info-modal-title" class="text-base sm:text-lg font-extrabold text-yellow-300 leading-tight drop-shadow-[0_2px_0_rgba(0,0,0,0.5)]">
+            Informasi &amp; Kredit Aplikasi
+          </h2>
+        </div>
+        <button id="btn-close-modal-x" aria-label="Tutup Jendela Informasi" class="w-8 h-8 rounded-full bg-black/35 hover:bg-black/60 text-amber-200 hover:text-white flex items-center justify-center font-extrabold text-sm border border-amber-600/50 transition-colors cursor-pointer">
+          ✕
+        </button>
+      </div>
+
+      <!-- Konten Detail Informasi Aplikasi -->
+      <div class="p-5 space-y-3.5 text-xs sm:text-sm">
+        <div class="bg-white/90 rounded-xl p-3.5 border-2 border-amber-900/25 shadow-sm">
+          <div class="text-[11px] uppercase tracking-wider font-extrabold text-amber-800">🍫 Nama Aplikasi</div>
+          <div class="font-extrabold text-amber-950 text-sm sm:text-base mt-0.5 leading-snug">
+            Cacao Alchemist: Fermentasi &amp; Belahan Biji Virtual (Cut Test)
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-2.5">
+          <div class="bg-white/85 rounded-xl p-3 border border-amber-900/20 flex items-start gap-3 shadow-sm">
+            <span class="text-xl bg-amber-100 p-1.5 rounded-lg border border-amber-300">👩‍🏫</span>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider font-extrabold text-amber-800">Pengembang / Pemilik</div>
+              <div class="font-extrabold text-stone-900 text-sm sm:text-base">Adelia Mewengkang, S.Pd.</div>
+            </div>
+          </div>
+
+          <div class="bg-white/85 rounded-xl p-3 border border-amber-900/20 flex items-start gap-3 shadow-sm">
+            <span class="text-xl bg-emerald-100 p-1.5 rounded-lg border border-emerald-300">🏫</span>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider font-extrabold text-emerald-800">Instansi</div>
+              <div class="font-extrabold text-stone-900 text-sm sm:text-base">SMK Negeri 1 Bolaang</div>
+            </div>
+          </div>
+
+          <div class="bg-white/85 rounded-xl p-3 border border-amber-900/20 flex items-start gap-3 shadow-sm">
+            <span class="text-xl bg-sky-100 p-1.5 rounded-lg border border-sky-300">📅</span>
+            <div>
+              <div class="text-[11px] uppercase tracking-wider font-extrabold text-sky-800">Tanggal Rilis</div>
+              <div class="font-extrabold text-stone-900 text-sm sm:text-base">11 November 2026</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Modal dengan Tombol Tutup -->
+        <div class="pt-2 border-t-2 border-amber-900/15 flex justify-end">
+          <button id="btn-close-modal-footer" class="btn-3d btn-gold px-6 py-2 text-xs sm:text-sm w-full sm:w-auto shadow-md">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifikasi Non-Blocking -->
+  <div id="toast" class="fixed bottom-16 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm border-2 border-white shadow-xl transition-opacity duration-300 opacity-0 pointer-events-none bg-emerald-600 text-white text-center max-w-[92vw]"></div>
+
+<script>
+// ============================================================================
+// KONTROL MODAL POP-UP INFORMASI & KREDIT APLIKASI
+// ============================================================================
+(function initInfoModal() {
+  const openBtn = document.getElementById('btn-info-credits');
+  const backdrop = document.getElementById('info-modal-backdrop');
+  const modalBox = document.getElementById('info-modal-box');
+  const closeBtnX = document.getElementById('btn-close-modal-x');
+  const closeBtnFooter = document.getElementById('btn-close-modal-footer');
+
+  function openModal() {
+    backdrop.classList.remove('hidden');
+    backdrop.classList.add('flex');
+    closeBtnFooter.focus();
+  }
+
+  function closeModal() {
+    backdrop.classList.add('hidden');
+    backdrop.classList.remove('flex');
+  }
+
+  openBtn.addEventListener('click', openModal);
+  closeBtnX.addEventListener('click', closeModal);
+  closeBtnFooter.addEventListener('click', closeModal);
+
+  // Tutup modal ketika pengguna mengklik area luar kotak pop-up (backdrop)
+  backdrop.addEventListener('click', (e) => {
+    if (!modalBox.contains(e.target)) {
+      closeModal();
+    }
+  });
+
+  // Tutup modal dengan tombol Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !backdrop.classList.contains('hidden')) {
+      closeModal();
+    }
+  });
+})();
+
+// ============================================================================
+// EFEK SUARA MEKANIK PISAU GUILLOTINE (WEB AUDIO API TANPA URL EKSTERNAL)
+// ============================================================================
+function playGuillotineSound() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+
+    // Bunyi gesekan logam bilah meluncur turun
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(520, now);
+    osc.frequency.exponentialRampToValueAtTime(110, now + 0.14);
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.17);
+
+    // Bunyi benturan "KLAK!" pada landasan kayu
+    const thud = ctx.createOscillator();
+    const thudGain = ctx.createGain();
+    thud.type = 'sine';
+    thud.frequency.setValueAtTime(160, now + 0.12);
+    thud.frequency.exponentialRampToValueAtTime(48, now + 0.28);
+    thudGain.gain.setValueAtTime(0.28, now + 0.12);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    thud.connect(thudGain);
+    thudGain.connect(ctx.destination);
+    thud.start(now + 0.12);
+    thud.stop(now + 0.31);
+  } catch (err) {
+    // Abaikan jika browser memblokir audio otomatis
+  }
+}
+
+// Efek Suara Klik Kayu Lembut saat Membuka/Menutup Kartu Materi Belajar
+function playWoodClickSound(isOpening = true) {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(isOpening ? 340 : 280, now);
+    osc.frequency.exponentialRampToValueAtTime(isOpening ? 520 : 190, now + 0.065);
+
+    gain.gain.setValueAtTime(0.11, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.075);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.08);
+  } catch (err) {
+    // Abaikan jika browser memblokir audio otomatis
+  }
+}
+
+// ============================================================================
+// STATE & DATA STANDAR MUTU SNI 2323:2008 + MATERI PROJEK IPAS
+// ============================================================================
+const State = {
+  // Navigasi Materi Pembelajaran (5 Slide)
+  studySlide: 1,
+  studyFilter: 'all', // 'all' | 'fisika' | 'kimia'
+  studyFaseTab: 'anaerob', // 'anaerob' | 'aerob'
+  openStudyItems: {}, // Menyimpan status buka/tutup setiap item materi & contoh
+
+  // Simulasi Fermentasi 6 Hari (100% Kontrol Manual Pengguna)
+  day: 1,
+  maxDays: 6,
+  temp: 28,
+  tempHistory: [28],
+  ph: 5.6,
+  pulpLevel: 100,
+  turnsDone: [],
+  totalTurns: 0,
+  leafClosed: true,
+
+  // Uji Belah Biji (Cut Test) dengan Alat Pisau Guillotine
+  samples: [],
+  cutCount: 0,
+  selectedSampleIdx: 0,
+  isChopping: false,
+  batchCutRunning: false,
+
+  // Galeri & Kuis Evaluasi
+  gallerySelected: 'brown',
+  quizIdx: 0,
+  quizScore: 0,
+  quizAnswered: false,
+  totalScore: 0
+};
+
+const BEAN_CATEGORIES = {
+  purple: {
+    id: 'purple',
+    title: 'Ungu Pekat (Under-Fermented)',
+    sniBadge: 'Kurang Fermentasi',
+    badgeClass: 'bg-purple-700 text-white',
+    outerColor: '#663820',
+    innerFill: '#6b1d7a',
+    innerRim: '#420c4d',
+    fissureColor: '#450a52',
+    fissureWidth: 1.1,
+    hasMold: false,
+    changeType: 'Perubahan Kimia Belum Tuntas',
+    flavor: 'Sangat sepat (astringent), pahit, dan aroma khas cokelat belum terbentuk.',
+    science: 'Pigmen antosianin berwarna ungu pekat belum terhidrolisis karena waktu fermentasi terlalu singkat (Hari 1–3) atau suhu fermentasi terlalu rendah (<38°C).'
+  },
+  partly: {
+    id: 'partly',
+    title: 'Ungu Kecokelatan (Partly Fermented)',
+    sniBadge: 'Fermentasi Sebagian',
+    badgeClass: 'bg-amber-700 text-white',
+    outerColor: '#5c311a',
+    innerFill: '#854648',
+    innerRim: '#542628',
+    fissureColor: '#3d191b',
+    fissureWidth: 2.2,
+    hasMold: false,
+    changeType: 'Perubahan Kimia Parsial',
+    flavor: 'Sedikit sepat di lidah, aroma cokelat mulai muncul namun belum maksimal.',
+    science: 'Oksidasi polifenol baru terjadi di tepi keping biji karena pembalikan hanya dilakukan 1 kali atau durasi fermentasi berhenti di Hari ke-4/5.'
+  },
+  brown: {
+    id: 'brown',
+    title: 'Cokelat Penuh Berongga (Fully Fermented)',
+    sniBadge: 'Mutu AA / Sempurna',
+    badgeClass: 'bg-emerald-600 text-white',
+    outerColor: '#4a2410',
+    innerFill: '#7a3b18',
+    innerRim: '#421d09',
+    fissureColor: '#260e02',
+    fissureWidth: 3.5,
+    hasMold: false,
+    changeType: 'Perubahan Kimia & Fisika Optimal',
+    flavor: 'Aroma cokelat kuat, rasa seimbang, tidak sepat, dan renyah saat dipatahkan.',
+    science: 'Suhu ideal 45–50°C dan pembalikan tepat di Hari ke-2 & ke-4 mengoksidasi polifenol menjadi senyawa cokelat serta membentuk rongga/rekahan (fissures) di keping biji.'
+  },
+  slaty: {
+    id: 'slaty',
+    title: 'Abu-abu Padat (Slaty / Gagal)',
+    sniBadge: 'Cacat Slaty (SNI)',
+    badgeClass: 'bg-slate-600 text-white',
+    outerColor: '#574941',
+    innerFill: '#69717a',
+    innerRim: '#42484f',
+    fissureColor: '#505760',
+    fissureWidth: 0.7,
+    hasMold: false,
+    changeType: 'Kegagalan Fermentasi Mikroba',
+    flavor: 'Hambar, sangat kelat, tekstur padat keras seperti batu tulis, tanpa aroma cokelat.',
+    science: 'Kotak tidak pernah dibalik sehingga kurang aerasi oksigen & suhu tidak naik; biji mati tanpa aktivitas enzimatis sehingga keping tetap padat keabu-abuan.'
+  },
+  moldy: {
+    id: 'moldy',
+    title: 'Biji Berjamur (Moldy / Kontaminasi)',
+    sniBadge: 'Cacat Jamur (Ditolak)',
+    badgeClass: 'bg-red-600 text-white',
+    outerColor: '#5c4b3e',
+    innerFill: '#6b4d3b',
+    innerRim: '#422d21',
+    fissureColor: '#291a11',
+    fissureWidth: 2.4,
+    hasMold: true,
+    changeType: 'Kontaminasi Biologis (Kapang)',
+    flavor: 'Bau apek/tengik, merusak cita rasa cokelat, dan berisiko mengandung mikotoksin.',
+    science: 'Terlalu sering membalik atau membuka penutup kotak (≥ 4 kali) memasukkan spora jamur dan kelembapan berlebih sehingga hifa putih-kehijauan tumbuh di dalam biji.'
+  }
+};
+
+const SUMMARY_ROWS = [
+  {
+    aspek: 'Warna Keping Biji',
+    sebelum: 'Putih / Ungu / Keabuan',
+    sesudah: 'Cokelat / Cokelat Kemerahan',
+    jenis: 'Fisika',
+    kategori: 'fisika',
+    badge: 'bg-sky-600 text-white',
+    ikon: '🎨',
+    penjelasan: 'Pigmen antosianin berwarna ungu pada biji segar terhidrolisis oleh enzim glikosidase saat suhu mencapai 40–45°C dan pH menurun, lalu polifenol teroksidasi membentuk warna cokelat khas.',
+    contoh: 'Saat uji belah (Cut Test) di laboratorium, biji sebelum fermentasi tampak ungu terang seperti ubi ungu, sedangkan biji terfermentasi 6 hari berubah menjadi cokelat tua merata seperti kayu mahoni.'
+  },
+  {
+    aspek: 'Lapisan Lendir (Pulp)',
+    sebelum: 'Tebal, manis, berair',
+    sesudah: 'Terurai, mencair, dan hilang',
+    jenis: 'Fisika & Kimia',
+    kategori: 'fisika',
+    badge: 'bg-teal-600 text-white',
+    ikon: '💧',
+    penjelasan: 'Enzim pektinase dari mikroorganisme khamir memecah pektin pada daging buah (pulp) sehingga viskositas lendir turun drastis dan mengalir keluar sebagai cairan pulpa (sweatings).',
+    contoh: 'Pada kotak fermentasi di kebun, hari ke-1 biji diselimuti lendir putih licin seperti daging sirsak; pada hari ke-3 lendir mencair dan menetes keluar lewat lubang bawah kotak sehingga kulit biji terasa kesat.'
+  },
+  {
+    aspek: 'Struktur Dalam Biji',
+    sebelum: 'Padat dan keras',
+    sesudah: 'Lunak dan berongga',
+    jenis: 'Fisika',
+    kategori: 'fisika',
+    badge: 'bg-sky-600 text-white',
+    ikon: '🧱',
+    penjelasan: 'Difusi asam asetat dan panas merusak dinding sel kotiledon serta melepaskan gas, sehingga jaringan dalam biji menyusut dan membentuk rekahan/rongga udara (fissures).',
+    contoh: 'Biji tanpa fermentasi terasa keras padat seperti batu tulis saat dibelah pisau guillotine, sedangkan biji terfermentasi sempurna tampak berongga-rongga kecil mirip sarang lebah mini dan renyah dipatahkan.'
+  },
+  {
+    aspek: 'Suhu Tumpukan',
+    sebelum: 'Suhu ruang (± 28°C)',
+    sesudah: 'Panas (40°C – 45°C+)',
+    jenis: 'Fisika (Eksotermis)',
+    kategori: 'fisika',
+    badge: 'bg-orange-600 text-white',
+    ikon: '🌡️',
+    penjelasan: 'Oksidasi etanol menjadi asam asetat oleh bakteri Acetobacter merupakan reaksi eksotermis yang melepaskan energi kalor dalam jumlah besar ke dalam tumpukan biji.',
+    contoh: 'Ketika termometer batang ditancapkan ke tengah kotak fermentasi atau daun pisang dibuka pada hari ke-3, suhu terbaca 45°C–48°C dan tampak uap tipis mengepul seperti nasi hangat.'
+  },
+  {
+    aspek: 'Kadar Polifenol (Tanin)',
+    sebelum: 'Tinggi (sangat pahit & sepat)',
+    sesudah: 'Turun lebih dari 50% (rasa seimbang)',
+    jenis: 'Kimia',
+    kategori: 'kimia',
+    badge: 'bg-purple-700 text-white',
+    ikon: '🧪',
+    penjelasan: 'Enzim polifenol oksidase (PPO) mengoksidasi senyawa polifenol larut air (katekin dan antosianin) menjadi senyawa kuinon kompleks yang tidak larut dan tidak terasa sepat.',
+    contoh: 'Jika keping biji mentah dicicipi sedikit, lidah terasa sangat kelat/sepat seperti mengunyah kulit pisang mentah; setelah fermentasi 6 hari, rasa sepat berkurang drastis dan muncul rasa cokelat gurih-pahit.'
+  },
+  {
+    aspek: 'Kandungan Gula & Protein',
+    sebelum: 'Senyawa kompleks (belum beraroma)',
+    sesudah: 'Asam amino & gula pereduksi (calon aroma)',
+    jenis: 'Kimia (Enzimatik)',
+    kategori: 'kimia',
+    badge: 'bg-purple-700 text-white',
+    ikon: '⚗️',
+    penjelasan: 'Enzim protease menghidrolisis protein penyimpanan menjadi asam amino bebas, sedangkan enzim invertase memecah sukrosa menjadi glukosa dan fruktosa (gula pereduksi).',
+    contoh: 'Biji fermentasi kering yang disangrai pada suhu 120–140°C akan memicu reaksi Maillard antara asam amino dan gula pereduksi sehingga langsung menghasilkan aroma harum khas cokelat panggang.'
+  }
+];
+
+const STUDY_SLIDE_DETAILS = {
+  s1Tujuan: {
+    penjelasan: 'Dalam materi Projek IPAS "Zat dan Perubahannya", fermentasi biji kakao merupakan contoh nyata keterkaitan antara perubahan fisika (perubahan wujud lendir, warna, suhu, dan struktur rongga) dengan perubahan kimia (reaksi biokimia mikroorganisme dan enzim yang menghasilkan zat baru pembentuk cita rasa).',
+    contoh: 'Contoh di Industri & Kebun: Petani atau penguji mutu (grader) tidak cukup hanya melihat kulit luar biji kakao, tetapi wajib membelah biji secara memanjang (Cut Test) untuk membuktikan bahwa perubahan fisika dan kimia di dalam keping biji benar-benar terjadi sesuai standar SNI 2323:2008.'
+  },
+  s1Konsep: [
+    {
+      penjelasan: 'Biji kakao segar terbungkus lapisan pulpa (lendir) kaya glukosa, sukrosa, dan asam sitrat (pH ±3,5–5,6), sementara di dalam kotiledonnya terdapat sel pigmen antosianin dan polifenol yang tinggi.',
+      contoh: 'Contoh Nyata: Saat buah kakao masak dipetik dan dibelah, tampak 30–40 butir biji diselimuti lendir putih manis-asam. Jika biji dibelah melintang saat itu juga, keping bijinya tampak padat dan berwarna ungu pekat atau putih pucat tanpa aroma cokelat sama sekali.'
+    },
+    {
+      penjelasan: 'Fermentasi berlangsung selama 5–7 hari melalui dua tahapan berurutan: tahap anaerob (kedap udara oleh khamir) pada 48 jam pertama, diikuti tahap aerob (beroksigen oleh bakteri asam asetat) setelah tumpukan dibalik.',
+      contoh: 'Contoh Nyata: Sebanyak ±40 kg biji kakao basah dimasukkan ke dalam kotak kayu berlubang drainase, ditutup rapat daun pisang selama 2 hari, lalu diaduk/dibalik pada Hari ke-2 dan Hari ke-4 agar udara masuk dan suhu naik hingga 45–50°C.'
+    },
+    {
+      penjelasan: 'Biji bermutu tinggi telah mengalami kematian embrio, penurunan polifenol >50%, serta pembentukan prekursor aroma (asam amino & gula pereduksi) sehingga siap diolah menjadi bubuk maupun lemak cokelat premium.',
+      contoh: 'Contoh Nyata: Biji kakao kering (kadar air ≤7,5%) berstandar Mutu AA (SNI 2323:2008) terasa ringan dan renyah saat dipatahkan, kulit arinya mudah terkelupas, bagian dalamnya cokelat penuh berongga, dan beraroma cokelat kuat.'
+    }
+  ],
+  s2Fases: {
+    anaerob: {
+      penjelasan: 'Pada 24–48 jam pertama, rongga antar-biji tertutup rapat oleh lapisan lendir (pulp) yang kental sehingga oksigen (O₂) tidak dapat masuk. Khamir (Saccharomyces sp.) memfermentasi gula pulp menjadi etanol (alkohol) dan gas CO₂, sekaligus mendegradasi pektin pulp.',
+      contoh: 'Contoh Pengamatan Lapangan: Cairan bening berasa manis-asam mulai menetes dari celah bawah kotak fermentasi pada 24–48 jam pertama, dan saat penutup daun pisang diintip tercium aroma seperti tape/alkohol ringan karena kerja khamir.'
+    },
+    aerob: {
+      penjelasan: 'Setelah lendir mencair dan tumpukan diaduk/dibalik, udara (O₂) masuk ke sela-sela biji. Bakteri Acetobacter mengoksidasi etanol menjadi asam asetat (C₂H₄O₂) melalui reaksi eksotermis yang menaikkan suhu tumpukan hingga 45–50°C.',
+      contoh: 'Contoh Pengamatan Lapangan: Setelah tumpukan biji diaduk/dibalik pada hari ke-2, udara masuk sehingga suhu tumpukan terasa hangat hingga panas (45–50°C) saat disentuh, muncul uap air tipis, dan tercium aroma asam cuka segar karena aktivitas bakteri Acetobacter.'
+    }
+  },
+  s3Fisika: [
+    {
+      penjelasan: 'Pigmen antosianin ungu di dalam sel kotiledon terurai oleh enzim glikosidase pada kondisi asam dan hangat, kemudian senyawa polifenol teroksidasi menghasilkan warna cokelat kemerahan hingga cokelat penuh.',
+      contoh: 'Contoh Konkret: Membandingkan belahan keping biji hari ke-1 yang berwarna ungu terang seperti ubi ungu dengan keping biji hari ke-6 yang berubah menjadi cokelat tua merata seperti kayu mahoni.'
+    },
+    {
+      penjelasan: 'Aktivitas enzim pektinase yang dihasilkan mikroorganisme memecah jaringan pektin pada daging buah (pulp) sehingga lapisan lendir kehilangan kekentalannya, mencair, dan keluar melalui lubang drainase.',
+      contoh: 'Contoh Konkret: Lapisan lendir putih tebal seperti daging buah sirsak/manggis pada hari ke-1 mencair dan mengalir keluar melalui lubang drainase kotak kayu pada hari ke-3 sehingga biji tampak lebih kesat.'
+    },
+    {
+      penjelasan: 'Penetrasi asam asetat dan suhu tinggi merusak integritas dinding sel bagian dalam biji, menyebabkan kotiledon menyusut dan membentuk celah atau rongga udara mikro (fissures) ketika dikeringkan.',
+      contoh: 'Contoh Konkret: Biji mentah terasa kenyal-padat dan sulit dipatahkan, sedangkan biji terfermentasi sempurna kulit arinya mudah dikupas dan bagian dalamnya memiliki rongga-rongga kecil (fissures) mirip sarang lebah mini saat dibelah pisau guillotine.'
+    },
+    {
+      penjelasan: 'Metabolisme oksidasi mikroba aerob bersifat eksotermis (melepaskan panas ke lingkungan), sehingga energi kalor terakumulasi di dalam kotak kayu yang terisolasi daun pisang.',
+      contoh: 'Contoh Konkret: Saat termometer ditancapkan ke tengah tumpukan atau penutup daun pisang dibuka pada hari ke-3, terasa hawa panas (40°C–45°C+) dan tampak uap tipis mengepul seperti nasi yang baru matang.'
+    }
+  ],
+  s4Kimia: [
+    {
+      penjelasan: 'Asam laktat dan asam asetat hasil metabolisme mikroba berdifusi menembus kulit biji ke dalam kotiledon sehingga menurunkan pH dari ±5,6 menjadi ±4,2–4,4 pada hari ke-3/4, sebelum naik kembali ke ±4,9 akibat penguapan asam asetat.',
+      contoh: 'Contoh Konkret: Pengujian cairan biji pada hari ke-3 menggunakan kertas lakmus biru akan mengubahnya menjadi merah (pH ±4,3 akibat asam asetat), lalu pada hari ke-6 tingkat keasaman menurun kembali (pH naik ke ±4,9) karena sebagian asam menguap.'
+    },
+    {
+      penjelasan: 'Kombinasi suhu 40°C–45°C+ dan difusi asam asetat mematikan embrio biji (inaktivasi) serta memecah membran vakuola sel sehingga enzim protease, invertase, dan polifenol oksidase saling bertemu dan aktif bekerja.',
+      contoh: 'Contoh Konkret: Biji kakao yang telah difermentasi tidak akan tumbuh menjadi tunas tanaman jika ditanam di tanah karena embrionya telah mati oleh panas 45°C dan asam asetat, memicu enzim protease & invertase bekerja memecah isi sel.'
+    },
+    {
+      penjelasan: 'Enzim endoprotease dan karboksipeptidase memecah protein cadangan menjadi asam amino bebas hidrofobik, sementara invertase memecah sukrosa menjadi gula pereduksi sebagai bahan baku reaksi Maillard.',
+      contoh: 'Contoh Konkret: Biji kering hasil fermentasi yang belum disangrai masih beraroma asam-buah ringan, tetapi saat dipanaskan/disangrai (reaksi Maillard antara asam amino dan gula pereduksi), langsung muncul aroma cokelat panggang yang harum.'
+    },
+    {
+      penjelasan: 'Selama fase aerob, enzim polifenol oksidase mengoksidasi senyawa polifenol (katekin dan epikatekin) menjadi polimer kuinon yang berikatan dengan protein sehingga kadar polifenol bebas turun >50%.',
+      contoh: 'Contoh Konkret: Jika keping biji tanpa fermentasi dicicipi sedikit, rasanya sangat sepat/kelat seperti mengunyah kulit pisang mentah, sedangkan biji yang difermentasi sempurna rasa sepatnya hilang drastis dan terasa gurih-pahit seimbang.'
+    }
+  ]
+};
+
+const QUIZ_QUESTIONS = [
+  {
+    q: 'Pada fase aerob fermentasi biji kakao (Hari ke-3 s.d. ke-7), mikroorganisme apa yang berperan mengubah alkohol menjadi asam asetat sambil melepaskan panas tinggi?',
+    opts: [
+      'Bakteri Asam Asetat (Acetobacter)',
+      'Khamir (Yeast) dalam kondisi kedap udara',
+      'Jamur kapang putih di permukaan kulit biji'
+    ],
+    ans: 0,
+    exp: 'Pada fase aerob (saat udara/oksigen masuk setelah diaduk), bakteri Acetobacter mengoksidasi alkohol menjadi asam asetat secara eksotermis (menghasilkan panas).'
+  },
+  {
+    q: 'Mengapa kadar senyawa polifenol (tanin) di dalam biji kakao harus diturunkan lebih dari 50% selama fermentasi?',
+    opts: [
+      'Agar biji kakao berubah menjadi keras dan berwarna abu-abu padat',
+      'Untuk menghilangkan rasa sepat (astringency) dan mengurangi rasa pahit berlebih pada cokelat',
+      'Supaya lapisan lendir (pulp) tetap kental dan tidak mencair'
+    ],
+    ans: 1,
+    exp: 'Oksidasi polifenol menurunkan kadar tanin lebih dari 50% sehingga rasa sepat hilang dan cita rasa cokelat menjadi seimbang.'
+  },
+  {
+    q: 'Apa ciri visual keping biji (kotiledon) pada uji belah (Cut Test) yang menunjukkan fermentasi sempurna (Mutu AA)?',
+    opts: [
+      'Berwarna abu-abu pucat dan bertekstur keras padat tanpa rongga',
+      'Berwarna cokelat penuh / cokelat kemerahan merata dengan rongga-rongga kecil (fissures)',
+      'Berwarna ungu tua pekat di seluruh permukaan keping biji'
+    ],
+    ans: 1,
+    exp: 'Penetrasi asam, panas 40–45°C+, dan oksidasi polifenol mengubah warna keping menjadi cokelat penuh dan membentuk rongga/rekahan (fissures).'
+  }
+];
+
+const appEl = document.getElementById('app');
+const screenEl = document.getElementById('screen');
+let toastTimeout = null;
+let chopTimeout = null;
+let batchInterval = null;
+
+function animateScreenEntry() {
+  screenEl.classList.remove('screen-enter');
+  void screenEl.offsetWidth;
+  screenEl.classList.add('screen-enter');
+}
+
+function clearCutTimers() {
+  clearTimeout(chopTimeout);
+  clearInterval(batchInterval);
+  State.isChopping = false;
+  State.batchCutRunning = false;
+}
+
+function showToast(msg, type = 'ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `fixed bottom-16 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm border-2 border-white shadow-xl transition-opacity duration-300 opacity-100 text-center max-w-[92vw] ${
+    type === 'warn' ? 'bg-amber-600 text-white' : type === 'err' ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'
+  }`;
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => { el.style.opacity = '0'; }, 2600);
+}
+
+// ============================================================================
+// KOMPONEN ILUSTRASI SVG (DENGAN PENCAHAYAAN & ANIMASI HIDUP)
+// ============================================================================
+function svgFarmer() {
+  return `<svg viewBox="0 0 200 215" class="w-36 sm:w-44 h-auto mx-auto drop-shadow-[0_14px_18px_rgba(0,0,0,0.45)]">
+    <!-- Bayangan Tanah Pijakan 3D -->
+    <ellipse cx="100" cy="208" rx="54" ry="7" fill="rgba(16, 36, 8, 0.45)"/>
+    <g class="farmer-idle">
+      <ellipse cx="100" cy="56" rx="64" ry="15" fill="#8c6239" stroke="#3b230e" stroke-width="3"/>
+      <path d="M56,122 C50,152 48,192 50,212 L150,212 C152,192 150,152 144,122 Z" fill="#e8d5b7" stroke="#3b230e" stroke-width="3"/>
+      <path d="M68,120 L132,120 L138,212 L62,212 Z" fill="#6b3e1d" stroke="#2e1707" stroke-width="3"/>
+      <ellipse cx="100" cy="158" rx="13" ry="8" fill="#d9943b" stroke="#3b1d08" stroke-width="2" transform="rotate(-20 100 158)"/>
+      <rect x="89" y="96" width="22" height="18" rx="7" fill="#f5b88c" stroke="#3b230e" stroke-width="2.5"/>
+      <circle cx="100" cy="70" r="31" fill="#f7c097" stroke="#3b230e" stroke-width="3"/>
+      <path d="M69,61 C73,41 127,41 131,61 C120,51 80,51 69,61 Z" fill="#2b170a"/>
+      <circle cx="89" cy="70" r="4" fill="#2b170a"/><circle cx="90.5" cy="68.5" r="1.3" fill="#fff"/>
+      <circle cx="111" cy="70" r="4" fill="#2b170a"/><circle cx="112.5" cy="68.5" r="1.3" fill="#fff"/>
+      <path d="M89,82 Q100,93 111,82" stroke="#7a2e16" stroke-width="3" fill="#fff" stroke-linecap="round"/>
+      <path d="M66,52 C68,26 132,26 134,52 Z" fill="#b88856" stroke="#3b230e" stroke-width="3"/>
+      <path d="M40,55 Q100,66 160,55" stroke="#3b230e" stroke-width="3.5" fill="none"/>
+      <!-- Kaca Pembesar & Kilau Lensa -->
+      <circle cx="152" cy="136" r="21" fill="#bae6fd" fill-opacity="0.78" stroke="#3b230e" stroke-width="4"/>
+      <line x1="136" y1="152" x2="122" y2="172" stroke="#4a2810" stroke-width="7" stroke-linecap="round"/>
+      <ellipse cx="152" cy="136" rx="11" ry="6.5" fill="#7a3b18" stroke="#260e02" stroke-width="2" transform="rotate(-25 152 136)"/>
+      <path class="lens-glint" d="M141,126 Q148,121 157,125" stroke="#ffffff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </g>
+  </svg>`;
+}
+
+function svgPhaseDiagram(phase) {
+  if (phase === 'anaerob') {
+    return `<svg viewBox="0 0 320 155" class="w-full max-w-[300px] mx-auto">
+      <rect x="25" y="45" width="270" height="90" rx="10" fill="#5c3112" stroke="#291304" stroke-width="3"/>
+      <path d="M32,68 Q160,54 288,68 L288,125 L32,125 Z" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+      <ellipse cx="90" cy="95" rx="22" ry="12" fill="#e2c6a8" stroke="#78350f" stroke-width="2"/>
+      <ellipse cx="160" cy="98" rx="22" ry="12" fill="#e2c6a8" stroke="#78350f" stroke-width="2"/>
+      <ellipse cx="230" cy="94" rx="22" ry="12" fill="#e2c6a8" stroke="#78350f" stroke-width="2"/>
+      <path d="M20,46 Q160,30 300,46 L295,62 Q160,52 25,62 Z" fill="#3f8f29" stroke="#1b4310" stroke-width="2.5"/>
+      <circle class="steam" cx="115" cy="76" r="6" fill="#fff" stroke="#0284c7" stroke-width="1.5"/>
+      <circle class="steam-2" cx="195" cy="74" r="7" fill="#fff" stroke="#0284c7" stroke-width="1.5"/>
+      <text x="160" y="22" text-anchor="middle" fill="#991b1b" font-size="11.5" font-weight="bold">🚫 Kedap O₂ (Tertutup Lendir Pulp)</text>
+      <text x="160" y="147" text-anchor="middle" fill="#451a03" font-size="11" font-weight="bold">Khamir: Gula Pulp → Alkohol + Gas CO₂</text>
+    </svg>`;
+  }
+  return `<svg viewBox="0 0 320 155" class="w-full max-w-[300px] mx-auto">
+    <rect x="25" y="52" width="270" height="83" rx="10" fill="#5c3112" stroke="#291304" stroke-width="3"/>
+    <ellipse cx="90" cy="96" rx="22" ry="12" fill="#9a5226" stroke="#3d1c08" stroke-width="2"/>
+    <ellipse cx="160" cy="92" rx="22" ry="12" fill="#85421b" stroke="#3d1c08" stroke-width="2"/>
+    <ellipse cx="230" cy="97" rx="22" ry="12" fill="#9a5226" stroke="#3d1c08" stroke-width="2"/>
+    <path d="M85,18 L85,46 M78,39 L85,47 L92,39" stroke="#0284c7" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M160,18 L160,46 M153,39 L160,47 L167,39" stroke="#0284c7" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M235,18 L235,46 M228,39 L235,47 L242,39" stroke="#0284c7" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <text x="160" y="13" text-anchor="middle" fill="#0369a1" font-size="11.5" font-weight="bold">💨 Oksigen (O₂) Masuk Saat Diaduk</text>
+    <text x="160" y="148" text-anchor="middle" fill="#7c2d12" font-size="11" font-weight="bold">Acetobacter: Alkohol + O₂ → Asam Asetat + 🔥 Panas</text>
+  </svg>`;
+}
+
+function svgPhChart() {
+  return `<svg viewBox="0 0 340 135" class="w-full max-w-[330px] mx-auto bg-white/90 rounded-xl border border-amber-900/25 p-1 shadow-inner">
+    <line x1="42" y1="20" x2="42" y2="105" stroke="#78350f" stroke-width="2"/>
+    <line x1="42" y1="105" x2="320" y2="105" stroke="#78350f" stroke-width="2"/>
+    <line x1="42" y1="35" x2="315" y2="35" stroke="#e5e7eb" stroke-dasharray="3"/>
+    <line x1="42" y1="65" x2="315" y2="65" stroke="#e5e7eb" stroke-dasharray="3"/>
+    <line x1="42" y1="90" x2="315" y2="90" stroke="#e5e7eb" stroke-dasharray="3"/>
+    <text x="36" y="38" text-anchor="end" font-size="9" fill="#451a03" font-weight="bold">pH 5,6</text>
+    <text x="36" y="68" text-anchor="end" font-size="9" fill="#451a03" font-weight="bold">pH 4,8</text>
+    <text x="36" y="93" text-anchor="end" font-size="9" fill="#451a03" font-weight="bold">pH 4,2</text>
+    <path d="M55,35 Q120,68 185,92 Q245,86 305,66" fill="none" stroke="#dc2626" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="55" cy="35" r="4.5" fill="#16a34a"/>
+    <circle cx="185" cy="92" r="4.5" fill="#dc2626"/>
+    <circle cx="305" cy="66" r="4.5" fill="#d97706"/>
+    <text x="62" y="27" font-size="8.5" fill="#15803d" font-weight="bold">Awal (±5,6)</text>
+    <text x="185" y="102" text-anchor="middle" font-size="8.5" fill="#b91c1c" font-weight="bold">Hari 3–4 Turun Tajam (Asam)</text>
+    <text x="275" y="56" text-anchor="middle" font-size="8.5" fill="#b45309" font-weight="bold">Hari 6–7 Naik (Asam Menguap)</text>
+    <text x="55" y="122" text-anchor="middle" font-size="9" fill="#451a03" font-weight="bold">H-1</text>
+    <text x="120" y="122" text-anchor="middle" font-size="9" fill="#451a03" font-weight="bold">H-2</text>
+    <text x="185" y="122" text-anchor="middle" font-size="9" fill="#451a03" font-weight="bold">H-4</text>
+    <text x="245" y="122" text-anchor="middle" font-size="9" fill="#451a03" font-weight="bold">H-5</text>
+    <text x="305" y="122" text-anchor="middle" font-size="9" fill="#451a03" font-weight="bold">H-7</text>
+  </svg>`;
+}
+
+function svgFermentBox(temp, leafClosed, day) {
+  const isIdeal = temp >= 45 && temp <= 50;
+  const isOver = temp > 50;
+  const beanFill = day <= 2 ? '#f5ead8' : day <= 4 ? '#c7976d' : '#854c27';
+  const beanStroke = day <= 2 ? '#8c6d53' : '#3d1e0a';
+
+  let beans = '';
+  for (let r = 0; r < 4; r++) {
+    for (let c = 0; c < 9; c++) {
+      const cx = 74 + c * 32 + (r % 2) * 11;
+      const cy = 94 + r * 17;
+      const rot = ((r * 19 + c * 23) % 36) - 18;
+      beans += `<ellipse cx="${cx}" cy="${cy}" rx="15" ry="8.5" fill="${beanFill}" stroke="${beanStroke}" stroke-width="1.8" transform="rotate(${rot} ${cx} ${cy})"/>`;
+    }
+  }
+
+  return `<svg viewBox="0 0 420 225" class="w-full max-w-[430px] mx-auto drop-shadow-[0_14px_20px_rgba(0,0,0,0.5)]">
+    <defs>
+      <radialGradient id="boxHeatGlow" cx="50%" cy="45%" r="55%">
+        <stop offset="0%" stop-color="${isOver ? '#ef4444' : isIdeal ? '#f59e0b' : '#fde68a'}" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="woodFrontGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#9e6030"/>
+        <stop offset="100%" stop-color="#5c3112"/>
+      </linearGradient>
+    </defs>
+
+    <!-- Bayangan Lantai Kotak -->
+    <ellipse cx="210" cy="216" rx="182" ry="7" fill="rgba(0, 0, 0, 0.42)"/>
+
+    ${temp >= 40 ? `
+      <ellipse class="heat-aura" cx="210" cy="84" rx="165" ry="38" fill="url(#boxHeatGlow)"/>
+      <g stroke="${isOver ? '#fca5a5' : '#ffffff'}" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.85">
+        <path class="steam" d="M125,64 Q114,42 130,22"/>
+        <path class="steam-2" d="M185,58 Q197,36 180,16"/>
+        <path class="steam-3" d="M245,60 Q234,38 250,18"/>
+        <path class="steam" d="M300,64 Q289,42 305,22"/>
+      </g>` : ''}
+
+    <rect x="42" y="68" width="336" height="105" rx="8" fill="#3d1e0a" stroke="#241004" stroke-width="4"/>
+    <path d="M46,84 Q120,64 210,79 Q300,64 374,84 L374,166 L46,166 Z" fill="#4d9434" stroke="#234d14" stroke-width="3"/>
+    ${beans}
+
+    ${leafClosed ? `
+      <g opacity="0.96">
+        <path d="M44,80 Q135,56 225,82 Q305,60 376,82 L370,130 Q210,120 50,130 Z" fill="#5eb33e" stroke="#234d14" stroke-width="3"/>
+        <path d="M55,95 L365,95 M110,78 L125,124 M210,76 L210,126 M305,78 L290,124" stroke="#367320" stroke-width="2" fill="none"/>
+        <rect x="140" y="90" width="140" height="24" rx="12" fill="#1e4211" opacity="0.92" stroke="#86efac" stroke-width="1"/>
+        <text x="210" y="106" text-anchor="middle" fill="#dcfce7" font-size="11.5" font-weight="bold">🍃 Tertutup Daun Pisang</text>
+      </g>` : `
+      <g>
+        <rect x="135" y="74" width="150" height="22" rx="11" fill="#7c2d12" opacity="0.92" stroke="#fdba74" stroke-width="1"/>
+        <text x="210" y="89" text-anchor="middle" fill="#ffedd5" font-size="11" font-weight="bold">💨 Penutup Dibuka (Aerasi)</text>
+      </g>`}
+
+    <rect x="35" y="136" width="350" height="74" rx="8" fill="url(#woodFrontGrad)" stroke="#291304" stroke-width="4"/>
+    <line x1="35" y1="160" x2="385" y2="160" stroke="#4a2810" stroke-width="3"/>
+    <line x1="35" y1="185" x2="385" y2="185" stroke="#4a2810" stroke-width="3"/>
+    <rect x="30" y="72" width="18" height="142" rx="4" fill="#6b3c19" stroke="#291304" stroke-width="3"/>
+    <rect x="372" y="72" width="18" height="142" rx="4" fill="#6b3c19" stroke="#291304" stroke-width="3"/>
+
+    <rect x="125" y="148" width="170" height="46" rx="8" fill="#2b1405" stroke="${isIdeal ? '#34d399' : '#d9943b'}" stroke-width="2.2"/>
+    <text x="210" y="167" text-anchor="middle" fill="#ffe699" font-size="11.5" font-weight="bold">KOTAK FERMENTASI</text>
+    <text x="210" y="185" text-anchor="middle" fill="${isIdeal ? '#6ee858' : isOver ? '#f87171' : '#fcd34d'}" font-size="12.5" font-weight="bold">
+      Suhu: ${temp}°C ${isIdeal ? '(IDEAL)' : isOver ? '(TERLALU PANAS)' : '(KURANG PANAS)'}
+    </text>
+  </svg>`;
+}
+
+// ============================================================================
+// VISUALISASI ALAT PISAU GUILLOTINE (COCOA BEAN GUILLOTINE CUTTER)
+// ============================================================================
+function svgGuillotineStation(sample, sampleIdx, isChopping) {
+  const info = BEAN_CATEGORIES[sample.type];
+  const isAlreadyCut = sample.cut && !isChopping;
+
+  // Bagian biji di dalam dudukan guillotine (Utuh / Sedang Terbelah / Sudah Terbelah)
+  let beanInSlotSVG = '';
+  if (!sample.cut && !isChopping) {
+    // Biji kakao utuh berada di dalam slot dudukan guillotine
+    beanInSlotSVG = `
+      <g>
+        <ellipse cx="200" cy="144" rx="52" ry="27" fill="#693b20" stroke="#261004" stroke-width="3"/>
+        <path d="M158,140 Q200,127 242,140 M162,152 Q200,163 238,152" stroke="#42210e" stroke-width="2.2" fill="none"/>
+        <ellipse cx="182" cy="133" rx="18" ry="4.5" fill="#ffffff" opacity="0.26"/>
+        <!-- Garis panduan potong memanjang (longitudinal) -->
+        <line x1="200" y1="112" x2="200" y2="174" stroke="#facc15" stroke-width="2" stroke-dasharray="4 3"/>
+      </g>
+    `;
+  } else {
+    // Dua belahan keping biji (kotiledon) membuka di dalam dudukan guillotine
+    const leftGroupClass = isChopping ? 'half-left-anim' : '';
+    const rightGroupClass = isChopping ? 'half-right-anim' : '';
+    const leftTransform = isAlreadyCut ? 'transform="translate(-20, 0) rotate(-6 185 154)"' : '';
+    const rightTransform = isAlreadyCut ? 'transform="translate(20, 0) rotate(6 215 154)"' : '';
+
+    beanInSlotSVG = `
+      <g>
+        <!-- Belahan Keping Kiri -->
+        <g class="${leftGroupClass}" ${leftTransform}>
+          <ellipse cx="168" cy="144" rx="34" ry="25" fill="${info.outerColor}" stroke="#241004" stroke-width="2.8"/>
+          <ellipse cx="168" cy="144" rx="28" ry="20" fill="${info.innerFill}" stroke="${info.innerRim}" stroke-width="2"/>
+          <path d="M148,140 Q162,131 172,143 T190,138 M150,151 Q166,158 184,149 M164,127 L168,141 M173,147 L170,162"
+                stroke="${info.fissureColor}" stroke-width="${info.fissureWidth}" fill="none" stroke-linecap="round"/>
+          ${info.hasMold ? `
+            <circle cx="158" cy="138" r="5.5" fill="#f1f5f9" opacity="0.92"/>
+            <circle cx="174" cy="148" r="6" fill="#bef264" opacity="0.88"/>
+            <circle cx="164" cy="153" r="4.5" fill="#ffffff" opacity="0.92"/>
+          ` : ''}
+        </g>
+
+        <!-- Belahan Keping Kanan -->
+        <g class="${rightGroupClass}" ${rightTransform}>
+          <ellipse cx="232" cy="144" rx="34" ry="25" fill="${info.outerColor}" stroke="#241004" stroke-width="2.8"/>
+          <ellipse cx="232" cy="144" rx="28" ry="20" fill="${info.innerFill}" stroke="${info.innerRim}" stroke-width="2"/>
+          <path d="M210,138 Q228,143 238,131 T252,140 M216,149 Q234,158 250,151 M236,127 L232,141 M227,147 L230,162"
+                stroke="${info.fissureColor}" stroke-width="${info.fissureWidth}" fill="none" stroke-linecap="round"/>
+          ${info.hasMold ? `
+            <circle cx="225" cy="140" r="5.5" fill="#bef264" opacity="0.88"/>
+            <circle cx="240" cy="147" r="5" fill="#ffffff" opacity="0.92"/>
+            <circle cx="230" cy="153" r="4.5" fill="#e2e8f0" opacity="0.92"/>
+          ` : ''}
+        </g>
+      </g>
+    `;
+  }
+
+  return `<svg viewBox="0 0 400 205" class="w-full max-w-[440px] mx-auto drop-shadow-[0_14px_20px_rgba(0,0,0,0.5)] ${isChopping ? 'board-shake' : ''}">
+    <defs>
+      <linearGradient id="steelGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#94a3b8"/>
+        <stop offset="45%" stop-color="#f8fafc"/>
+        <stop offset="55%" stop-color="#cbd5e1"/>
+        <stop offset="100%" stop-color="#64748b"/>
+      </linearGradient>
+      <linearGradient id="bladeEdge" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#e2e8f0"/>
+        <stop offset="80%" stop-color="#f8fafc"/>
+        <stop offset="100%" stop-color="#38bdf8"/>
+      </linearGradient>
+      <linearGradient id="woodBase" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#874b20"/>
+        <stop offset="100%" stop-color="#3b1b06"/>
+      </linearGradient>
+    </defs>
+
+    <!-- Label Stasiun Alat -->
+    <rect x="92" y="4" width="216" height="22" rx="11" fill="#2b1405" stroke="#d9943b" stroke-width="1.5"/>
+    <text x="200" y="18.5" text-anchor="middle" fill="#fde68a" font-size="11" font-weight="bold">
+      ⚙️ ALAT PEMOTONG PISAU GUILLOTINE
+    </text>
+
+    <!-- Bayangan Landasan Guillotine -->
+    <ellipse cx="200" cy="193" rx="158" ry="6" fill="rgba(0, 0, 0, 0.45)"/>
+
+    <!-- Landasan Kayu Utama Alat Guillotine -->
+    <rect x="46" y="164" width="308" height="26" rx="7" fill="url(#woodBase)" stroke="#241004" stroke-width="3"/>
+    <rect x="64" y="156" width="272" height="11" rx="4" fill="#a86432" stroke="#241004" stroke-width="2.5"/>
+
+    <!-- Dudukan / Cetakan Slot Biji Kakao (Cavity Block) -->
+    <path d="M126,156 L134,126 L160,126 L165,148 L235,148 L240,126 L266,126 L274,156 Z" fill="#cbd5e1" stroke="#334155" stroke-width="2.5"/>
+    <!-- Celah tengah untuk masuknya bilah pisau -->
+    <rect x="196" y="146" width="8" height="12" fill="#1e293b"/>
+
+    <!-- Biji Kakao di Dalam Dudukan -->
+    ${beanInSlotSVG}
+
+    <!-- Tiang Rel Pemandu Vertikal Kiri & Kanan (Stainless Steel Pillars) -->
+    <rect x="112" y="42" width="12" height="118" rx="4" fill="url(#steelGrad)" stroke="#1e293b" stroke-width="2.5"/>
+    <rect x="276" y="42" width="12" height="118" rx="4" fill="url(#steelGrad)" stroke="#1e293b" stroke-width="2.5"/>
+    <!-- Mur Pengunci Atas Tiang -->
+    <rect x="108" y="37" width="20" height="8" rx="3" fill="#475569" stroke="#0f172a" stroke-width="2"/>
+    <rect x="272" y="37" width="20" height="8" rx="3" fill="#475569" stroke="#0f172a" stroke-width="2"/>
+
+    <!-- RAKITAN BILAH PISAU & GAGANG GUILLOTINE YANG BERGERAK TURUN -->
+    <g id="guillotine-moving-assembly" class="${isChopping ? 'guillotine-chopping' : ''}">
+      <!-- Gagang Pegangan Kayu Ergonomis di Atas -->
+      <rect x="138" y="34" width="124" height="18" rx="9" fill="#9a5226" stroke="#2b1204" stroke-width="3"/>
+      <ellipse cx="200" cy="40" rx="44" ry="3.5" fill="#ffd9a0" opacity="0.4"/>
+
+      <!-- Batang Penekan Tengah -->
+      <rect x="193" y="52" width="14" height="18" fill="url(#steelGrad)" stroke="#1e293b" stroke-width="2.2"/>
+
+      <!-- Palang Penjepit Pisau & Selongsong Rel -->
+      <rect x="106" y="68" width="188" height="16" rx="5" fill="#475569" stroke="#0f172a" stroke-width="2.5"/>
+      <circle cx="118" cy="76" r="3" fill="#e2e8f0"/>
+      <circle cx="282" cy="76" r="3" fill="#e2e8f0"/>
+
+      <!-- Bilah Pisau Baja Guillotine Tajam (Miring/Runcing di Tengah) -->
+      <polygon points="154,84 246,84 246,102 200,114 154,102" fill="url(#bladeEdge)" stroke="#1e293b" stroke-width="2.5" stroke-linejoin="round"/>
+      <!-- Garis Ketajaman Mata Pisau -->
+      <polyline points="156,100 200,111 244,100" fill="none" stroke="#ffffff" stroke-width="2"/>
+    </g>
+
+    <!-- Efek Kilatan Potongan & Percikan Partikel Cahaya saat Pisau Mengenai Biji -->
+    ${isChopping ? `
+      <g class="slash-flash-anim">
+        <line x1="175" y1="138" x2="225" y2="152" stroke="#fef08a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="225" y1="138" x2="175" y2="152" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="200" cy="145" r="20" fill="#fef08a" opacity="0.5"/>
+        <rect x="130" y="96" width="140" height="24" rx="12" fill="#dc2626" stroke="#ffffff" stroke-width="2"/>
+        <text x="200" y="112" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="bold">💥 KLAK! TERBELAH!</text>
+      </g>
+      <circle class="spark-left" cx="192" cy="142" r="3.5" fill="#fef08a"/>
+      <circle class="spark-right" cx="208" cy="142" r="3.5" fill="#fde047"/>
+    ` : ''}
+
+    <!-- Keterangan Status Dudukan -->
+    <text x="200" y="181" text-anchor="middle" fill="#fef3c7" font-size="10.5" font-weight="bold">
+      Sampel #${sampleIdx + 1} di Dudukan Guillotine · ${isChopping ? 'Memotong Biji...' : sample.cut ? `Hasil: ${info.sniBadge}` : 'Siap Dipotong Memanjang'}
+    </text>
+  </svg>`;
+}
+
+// Ikon Mini untuk Baki 5 Sampel Biji
+function svgBeanTrayItem(typeKey, isCut, justCut = false) {
+  if (!isCut) {
+    return `<svg viewBox="0 0 120 76" class="w-20 sm:w-24 h-auto mx-auto drop-shadow-md">
+      <ellipse cx="60" cy="38" rx="40" ry="23" fill="#693b20" stroke="#2b1406" stroke-width="2.8"/>
+      <path d="M28,36 Q60,26 92,36 M32,45 Q60,53 88,45" stroke="#42210e" stroke-width="2" fill="none"/>
+      <ellipse cx="48" cy="29" rx="13" ry="3.5" fill="#fff" opacity="0.25"/>
+      <text x="60" y="70" text-anchor="middle" fill="#fef3c7" font-size="10" font-weight="bold">Utuh</text>
+    </svg>`;
+  }
+
+  const b = BEAN_CATEGORIES[typeKey];
+  return `<svg viewBox="0 0 144 78" class="w-22 sm:w-26 h-auto mx-auto drop-shadow-lg ${justCut ? 'split-anim' : ''}">
+    <g transform="translate(-3, 1)">
+      <ellipse cx="40" cy="38" rx="28" ry="22" fill="${b.outerColor}" stroke="#241004" stroke-width="2.3"/>
+      <ellipse cx="40" cy="38" rx="23" ry="17.5" fill="${b.innerFill}" stroke="${b.innerRim}" stroke-width="1.8"/>
+      <path d="M24,35 Q35,28 43,37 T58,33 M26,44 Q38,49 52,42 M37,24 L40,35 M44,40 L41,52"
+            stroke="${b.fissureColor}" stroke-width="${b.fissureWidth}" fill="none" stroke-linecap="round"/>
+      ${b.hasMold ? `
+        <circle cx="33" cy="33" r="4.5" fill="#f1f5f9" opacity="0.92"/>
+        <circle cx="46" cy="42" r="5" fill="#bef264" opacity="0.88"/>
+      ` : ''}
+    </g>
+    <g transform="translate(3, 1)">
+      <ellipse cx="104" cy="38" rx="28" ry="22" fill="${b.outerColor}" stroke="#241004" stroke-width="2.3"/>
+      <ellipse cx="104" cy="38" rx="23" ry="17.5" fill="${b.innerFill}" stroke="${b.innerRim}" stroke-width="1.8"/>
+      <path d="M86,33 Q101,37 109,28 T120,35 M92,42 Q106,49 118,44 M107,24 L104,35 M100,40 L103,52"
+            stroke="${b.fissureColor}" stroke-width="${b.fissureWidth}" fill="none" stroke-linecap="round"/>
+      ${b.hasMold ? `
+        <circle cx="99" cy="35" r="4.5" fill="#bef264" opacity="0.88"/>
+        <circle cx="110" cy="41" r="4.5" fill="#ffffff" opacity="0.92"/>
+      ` : ''}
+    </g>
+  </svg>`;
+}
+
+// ============================================================================
+// 1. MENU UTAMA
+// ============================================================================
+function renderMenu() {
+  clearCutTimers();
+  appEl.className = 'w-full max-w-[1140px] rounded-2xl overflow-hidden shadow-2xl border-4 border-[#361c08] bg-tropical flex flex-col justify-between min-h-[640px]';
+
+  screenEl.innerHTML = `
+    <header class="flex flex-wrap justify-between items-center gap-2">
+      <div class="wood-panel px-4 py-2 text-xs sm:text-sm font-bold text-amber-200">
+        🌱 Mata Pelajaran Projek IPAS | Materi: <span class="text-yellow-300">Zat dan Perubahannya</span>
+      </div>
+      <div class="wood-panel px-4 py-2 text-xs sm:text-sm font-bold text-amber-200">
+        ⭐ Skor Tertinggi: <span class="text-yellow-300">${State.totalScore}</span>
+      </div>
+    </header>
+
+    <section class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center my-auto py-4">
+      <div class="md:col-span-7 flex flex-col items-center md:items-start text-center md:text-left space-y-4">
+        <div class="wood-panel px-5 py-4 w-full sm:w-auto">
+          <div class="text-xs uppercase tracking-wider text-amber-300 font-extrabold">Mata Pelajaran Projek IPAS · Zat dan Perubahannya</div>
+          <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-yellow-300 drop-shadow-[0_3px_0_#3d1c04] leading-tight mt-1">
+            Cacao Alchemist: Fermentasi &amp; Belahan Biji Virtual (Cut Test)
+          </h1>
+          <span class="inline-block mt-2 bg-[#2b1405] text-amber-200 px-3 py-1 rounded-full text-xs font-bold border border-amber-700">
+            Media Pembelajaran Interaktif &amp; Simulasi Uji Mutu SNI 2323:2008
+          </span>
+        </div>
+
+        <div class="parchment p-4 text-xs sm:text-sm w-full">
+          <p class="font-extrabold text-amber-950 text-sm sm:text-base mb-1">🎯 Alur Belajar Siswa:</p>
+          <p class="leading-relaxed">
+            Pelajari konsep <b>perubahan fisika dan kimia</b> selama fermentasi biji kakao (fase anaerob &amp; aerob) melalui <b>5 Slide Materi Visual</b>, lalu uji keterampilanmu mengelola kotak fermentasi 6 hari secara mandiri dan membelah biji menggunakan <b>Alat Pisau Guillotine</b>!
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row flex-wrap gap-3 justify-center md:justify-start w-full">
+          <button id="btn-open-study" class="btn-3d btn-gold px-5 py-3 text-sm sm:text-base shadow-lg">
+            📖 Materi Belajar (5 Slide Visual)
+          </button>
+          <button id="btn-start-sim" class="btn-3d btn-green px-5 py-3 text-sm sm:text-base shadow-lg">
+            🧪 Mulai Simulasi Fermentasi &amp; Cut Test
+          </button>
+          <button id="btn-open-gallery" class="btn-3d btn-blue px-5 py-3 text-sm sm:text-base shadow-lg">
+            🔬 Galeri Standar Mutu Cut Test (SNI)
+          </button>
+        </div>
+      </div>
+
+      <div class="md:col-span-5 flex flex-col items-center justify-center">
+        <div class="parchment px-4 py-2.5 mb-2 text-center text-xs sm:text-sm font-bold max-w-xs">
+          "Yuk, buka <b>Materi Belajar</b> dulu supaya kamu paham rahasia perubahan warna &amp; aroma biji kakao!"
+        </div>
+        ${svgFarmer()}
+      </div>
+    </section>
+
+    <footer class="text-center text-xs text-amber-100 font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.65)]">
+      Langkah 1: Pelajari <b>Materi Belajar (5 Slide Visual)</b> → Langkah 2: Jalankan <b>Simulasi Fermentasi &amp; Cut Test</b> → Langkah 3: Evaluasi di <b>Galeri SNI</b>.
+    </footer>
+  `;
+
+  animateScreenEntry();
+  document.getElementById('btn-open-study').onclick = () => renderStudyModule(1);
+  document.getElementById('btn-start-sim').onclick = startFermentationStage;
+  document.getElementById('btn-open-gallery').onclick = () => renderGalleryAndQuiz('brown');
+}
+
+// ============================================================================
+// 2. MODUL MATERI BELAJAR VISUAL INTERAKTIF (5 SLIDE PROJEK IPAS)
+// ============================================================================
+function toggleStudyItem(itemKey, slideNum) {
+  const nextState = !State.openStudyItems[itemKey];
+  State.openStudyItems[itemKey] = nextState;
+  playWoodClickSound(nextState);
+  renderStudyModule(slideNum);
+}
+
+function setAllSlideItems(slideNum, openAll) {
+  const keysBySlide = {
+    1: ['s1-tujuan', 's1-konsep-0', 's1-konsep-1', 's1-konsep-2'],
+    2: ['s2-anaerob', 's2-aerob'],
+    3: ['s3-0', 's3-1', 's3-2', 's3-3'],
+    4: ['s4-0', 's4-1', 's4-2', 's4-3'],
+    5: ['s5-0', 's5-1', 's5-2', 's5-3', 's5-4', 's5-5']
+  };
+  (keysBySlide[slideNum] || []).forEach(k => {
+    State.openStudyItems[k] = openAll;
+  });
+  playWoodClickSound(openAll);
+  renderStudyModule(slideNum);
+}
+
+function renderDetailBoxHTML(penjelasan, contoh, accentClass = 'border-amber-600/40 bg-amber-50/95') {
+  return `
+    <div class="accordion-open mt-2.5 pt-2.5 border-t border-amber-900/20 space-y-2 text-left">
+      <div class="rounded-lg p-2.5 border ${accentClass} text-[11px] sm:text-xs text-stone-800 leading-relaxed shadow-inner">
+        <span class="font-extrabold text-amber-950">📖 Penjelasan Mendalam:</span> ${penjelasan}
+      </div>
+      <div class="rounded-lg p-2.5 border border-emerald-600/40 bg-emerald-50/95 text-[11px] sm:text-xs text-emerald-950 leading-relaxed shadow-inner">
+        <span class="font-extrabold text-emerald-900">💡 Contoh Konkret:</span> ${contoh}
+      </div>
+    </div>
+  `;
+}
+
+function renderStudyModule(slideNum = 1) {
+  clearCutTimers();
+  State.studySlide = Math.max(1, Math.min(5, slideNum));
+  appEl.className = 'w-full max-w-[1140px] rounded-2xl overflow-hidden shadow-2xl border-4 border-[#361c08] bg-shed flex flex-col justify-between min-h-[640px]';
+
+  const slideTitles = [
+    '1. Tujuan Pembelajaran',
+    '2. Tahap Fermentasi',
+    '3. Perubahan Fisika',
+    '4. Perubahan Kimia',
+    '5. Rangkuman Infografis'
+  ];
+
+  const tabsHTML = slideTitles.map((label, idx) => {
+    const num = idx + 1;
+    const isActive = num === State.studySlide;
+    return `<button data-slide="${num}" class="card-lift px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-extrabold border-2 transition-all ${
+      isActive
+        ? 'bg-yellow-300 text-amber-950 border-amber-950 scale-[1.03] shadow-md'
+        : 'bg-black/35 text-amber-100 border-amber-900/60 hover:bg-black/50'
+    }">${label}</button>`;
+  }).join('');
+
+  const quickExpandControlsHTML = `
+    <div class="flex items-center gap-1.5">
+      <button id="btn-expand-all-study" class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-700 hover:bg-emerald-600 text-white border border-emerald-950 shadow-sm cursor-pointer transition-colors">
+        📂 Buka Semua Contoh
+      </button>
+      <button id="btn-collapse-all-study" class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-stone-700 hover:bg-stone-600 text-amber-100 border border-stone-950 shadow-sm cursor-pointer transition-colors">
+        📁 Tutup Semua
+      </button>
+    </div>
+  `;
+
+  let slideBodyHTML = '';
+
+  if (State.studySlide === 1) {
+    const isTujuanOpen = !!State.openStudyItems['s1-tujuan'];
+    const konsepCards = [
+      {
+        idx: 0,
+        icon: '🍈',
+        title: '1. Biji Kakao Segar',
+        desc: 'Lendir (pulp) manis, biji ungu/putih, terasa sangat pahit &amp; sepat, belum beraroma cokelat.',
+        cardClass: 'bg-white border-amber-900/25',
+        titleClass: 'text-amber-950'
+      },
+      {
+        idx: 1,
+        icon: '📦🔥',
+        title: '2. Fermentasi (5–7 Hari)',
+        desc: 'Terjadi <b>Fase Anaerob</b> (Khamir) lalu <b>Fase Aerob</b> (Acetobacter) yang memicu perubahan fisika &amp; kimia.',
+        cardClass: 'bg-amber-50 border-amber-600',
+        titleClass: 'text-amber-950'
+      },
+      {
+        idx: 2,
+        icon: '🍫✨',
+        title: '3. Biji Bermutu (Mutu AA)',
+        desc: 'Keping biji cokelat penuh berongga, kadar polifenol turun &gt;50%, kaya calon aroma khas cokelat.',
+        cardClass: 'bg-emerald-50 border-emerald-600',
+        titleClass: 'text-emerald-950'
+      }
+    ];
+
+    slideBodyHTML = `
+      <div class="parchment p-5 sm:p-6 space-y-4 my-auto">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b-2 border-amber-900/20 pb-3">
+          <div>
+            <span class="bg-emerald-700 text-white text-xs font-extrabold px-3 py-1 rounded-full shadow-sm">SLIDE 1 · PENDAHULUAN</span>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-amber-950 mt-1.5">Mata Pelajaran Projek IPAS | Materi: Zat dan Perubahannya</h3>
+          </div>
+          <div class="flex items-center gap-2">
+            ${quickExpandControlsHTML}
+            <span class="text-3xl sm:text-4xl">🎯</span>
+          </div>
+        </div>
+
+        <div data-study-toggle="s1-tujuan" class="study-clickable bg-amber-100/90 border-2 ${isTujuanOpen ? 'border-amber-800 ring-2 ring-amber-400/50' : 'border-amber-700/40'} rounded-2xl p-4 sm:p-5 shadow-inner">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+            <div class="text-xs uppercase font-extrabold text-amber-900">Tujuan Pembelajaran:</div>
+            <span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${isTujuanOpen ? 'bg-amber-800 text-white' : 'bg-white/90 text-amber-900 border border-amber-700/30'}">
+              ${isTujuanOpen ? '▲ Tutup detail' : '👆 Klik untuk buka penjelasan & contoh'}
+            </span>
+          </div>
+          <p class="text-sm sm:text-base font-bold text-stone-900 leading-relaxed">
+            "Setelah mempelajari media interaktif ini, kamu diharapkan mampu <span class="text-emerald-800 underline">menganalisis perubahan fisika dan kimia</span> yang terjadi selama proses fermentasi biji kakao (<span class="text-amber-900">fase anaerob dan aerob</span>) serta mengaitkannya dengan <span class="text-amber-900">pembentukan mutu dan cita rasa cokelat</span>."
+          </p>
+          ${isTujuanOpen ? renderDetailBoxHTML(STUDY_SLIDE_DETAILS.s1Tujuan.penjelasan, STUDY_SLIDE_DETAILS.s1Tujuan.contoh) : ''}
+        </div>
+
+        <div>
+          <div class="text-xs font-extrabold text-amber-950 uppercase mb-2">🗺️ Peta Konsep Transformasi Biji Kakao (Klik Tiap Tahap untuk Contoh Nyata):</div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+            ${konsepCards.map(c => {
+              const key = `s1-konsep-${c.idx}`;
+              const isOpen = !!State.openStudyItems[key];
+              const det = STUDY_SLIDE_DETAILS.s1Konsep[c.idx];
+              return `
+                <div data-study-toggle="${key}" class="study-clickable ${c.cardClass} rounded-xl p-3 border-2 ${isOpen ? 'ring-2 ring-amber-500/60' : ''} shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div class="text-2xl mb-1">${c.icon}</div>
+                    <div class="font-extrabold ${c.titleClass} text-sm">${c.title}</div>
+                    <p class="text-xs text-stone-700 mt-1">${c.desc}</p>
+                  </div>
+                  <div class="mt-2">
+                    <span class="inline-block text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${isOpen ? 'bg-amber-800 text-white' : 'bg-amber-900/10 text-amber-950'}">
+                      ${isOpen ? '▲ Tutup detail' : '👆 Klik untuk buka penjelasan & contoh'}
+                    </span>
+                  </div>
+                  ${isOpen ? renderDetailBoxHTML(det.penjelasan, det.contoh) : ''}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (State.studySlide === 2) {
+    const isAnaerob = State.studyFaseTab === 'anaerob';
+    const isAnaerobOpen = !!State.openStudyItems['s2-anaerob'];
+    const isAerobOpen = !!State.openStudyItems['s2-aerob'];
+
+    slideBodyHTML = `
+      <div class="parchment p-4 sm:p-5 space-y-3 my-auto">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b-2 border-amber-900/20 pb-2">
+          <div>
+            <span class="bg-amber-700 text-white text-xs font-extrabold px-3 py-1 rounded-full shadow-sm">SLIDE 2 · INTI PEMBENTUKAN MUTU</span>
+            <h3 class="text-lg sm:text-2xl font-extrabold text-amber-950 mt-1">Tahap Fermentasi Biji Kakao (5–7 Hari)</h3>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5">
+            ${quickExpandControlsHTML}
+            <button id="tab-anaerob" class="card-lift px-3 py-1.5 rounded-full text-xs font-extrabold border-2 transition-all ${
+              isAnaerob ? 'bg-purple-700 text-white border-purple-950 shadow' : 'bg-white text-stone-700 border-stone-300'
+            }">1. Fase Anaerob (H1–H2)</button>
+            <button id="tab-aerob" class="card-lift px-3 py-1.5 rounded-full text-xs font-extrabold border-2 transition-all ${
+              !isAnaerob ? 'bg-sky-700 text-white border-sky-950 shadow' : 'bg-white text-stone-700 border-stone-300'
+            }">2. Fase Aerob (H3–H7)</button>
+          </div>
+        </div>
+
+        <p class="text-xs sm:text-sm text-stone-800 bg-white/80 p-3 rounded-xl border border-amber-900/20 leading-relaxed">
+          Pernahkah kamu mencicipi biji kakao segar langsung dari buahnya? Rasanya <b>manis di bagian lendir luar</b>, namun bijinya <b>sangat pahit dan sepat</b>, serta <b>sama sekali belum beraroma cokelat</b>! Untuk mengubah biji mentah menjadi cokelat berkualitas tinggi, diperlukan fermentasi <b>5–7 hari</b> yang terbagi menjadi dua fase utama berdasarkan kebutuhan oksigennya:
+        </p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-start">
+          <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div id="card-anaerob" class="study-clickable rounded-xl p-3.5 border-2 transition-all ${
+              isAnaerob ? 'bg-purple-50 border-purple-700 ring-2 ring-purple-400/50 shadow-md' : 'bg-white/85 border-stone-300'
+            }">
+              <div class="flex items-center justify-between mb-1">
+                <span class="bg-purple-700 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">Hari ke-1 s.d. ke-2</span>
+                <span class="text-lg">🫧</span>
+              </div>
+              <h4 class="font-extrabold text-purple-950 text-base">1. Fase Anaerob</h4>
+              <ul class="text-xs text-stone-800 space-y-1.5 mt-2">
+                <li><b>• Kondisi:</b> Tanpa oksigen (tumpukan biji masih tertutup rapat oleh lendir/pulp).</li>
+                <li><b>• Aktor Utama:</b> Khamir (<i>yeast</i>).</li>
+                <li><b>• Proses:</b> Khamir memecah gula pada lendir buah menjadi <b>alkohol</b> dan gas karbon dioksida (<b>CO₂</b>).</li>
+              </ul>
+              <div class="mt-2.5">
+                <span class="inline-block text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${isAnaerobOpen ? 'bg-purple-800 text-white' : 'bg-purple-100 text-purple-900 border border-purple-300'}">
+                  ${isAnaerobOpen ? '▲ Tutup detail' : '👆 Klik untuk buka penjelasan & contoh'}
+                </span>
+              </div>
+              ${isAnaerobOpen ? renderDetailBoxHTML(STUDY_SLIDE_DETAILS.s2Fases.anaerob.penjelasan, STUDY_SLIDE_DETAILS.s2Fases.anaerob.contoh, 'border-purple-400/60 bg-purple-100/70') : ''}
+            </div>
+
+            <div id="card-aerob" class="study-clickable rounded-xl p-3.5 border-2 transition-all ${
+              !isAnaerob ? 'bg-sky-50 border-sky-700 ring-2 ring-sky-400/50 shadow-md' : 'bg-white/85 border-stone-300'
+            }">
+              <div class="flex items-center justify-between mb-1">
+                <span class="bg-sky-700 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">Hari ke-3 s.d. ke-7</span>
+                <span class="text-lg">🌬️🔥</span>
+              </div>
+              <h4 class="font-extrabold text-sky-950 text-base">2. Fase Aerob</h4>
+              <ul class="text-xs text-stone-800 space-y-1.5 mt-2">
+                <li><b>• Kondisi:</b> Dengan oksigen (lendir mulai mencair dan tumpukan diaduk sehingga udara masuk).</li>
+                <li><b>• Aktor Utama:</b> Bakteri Asam Asetat (<i>Acetobacter</i>).</li>
+                <li><b>• Proses:</b> Bakteri mengubah alkohol menjadi <b>asam asetat (cuka)</b> sambil melepaskan <b>energi panas yang tinggi</b>.</li>
+              </ul>
+              <div class="mt-2.5">
+                <span class="inline-block text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${isAerobOpen ? 'bg-sky-800 text-white' : 'bg-sky-100 text-sky-900 border border-sky-300'}">
+                  ${isAerobOpen ? '▲ Tutup detail' : '👆 Klik untuk buka penjelasan & contoh'}
+                </span>
+              </div>
+              ${isAerobOpen ? renderDetailBoxHTML(STUDY_SLIDE_DETAILS.s2Fases.aerob.penjelasan, STUDY_SLIDE_DETAILS.s2Fases.aerob.contoh, 'border-sky-400/60 bg-sky-100/70') : ''}
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 bg-white/90 rounded-xl p-3 border-2 border-amber-900/25 text-center shadow-inner">
+            <div class="text-xs font-extrabold text-amber-950 mb-1">
+              Visualisasi Proses: ${isAnaerob ? 'Fase Anaerob (Tanpa O₂)' : 'Fase Aerob (Dengan O₂)'}
+            </div>
+            ${svgPhaseDiagram(State.studyFaseTab)}
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (State.studySlide === 3) {
+    const fisikaItems = [
+      {
+        idx: 0,
+        icon: '🎨',
+        iconBg: 'bg-sky-100',
+        border: 'border-sky-700/30',
+        titleClass: 'text-sky-950',
+        title: '1. Perubahan Warna Biji',
+        text: 'Biji kakao segar yang awalnya berwarna <b>putih, ungu pucat, atau keabuan</b> akan berangsur-angsur berubah menjadi <b>cokelat atau cokelat kemerahan</b> pada bagian keping bijinya (<i>kotiledon</i>). Warna cokelat penuh ini menjadi indikator visual bahwa fermentasi telah berjalan sempurna.'
+      },
+      {
+        idx: 1,
+        icon: '💧',
+        iconBg: 'bg-sky-100',
+        border: 'border-sky-700/30',
+        titleClass: 'text-sky-950',
+        title: '2. Degradasi Pulp (Daging Buah)',
+        text: 'Lapisan lendir putih (<i>pulp</i>) yang manis dan berair di bagian luar biji akan terurai oleh mikroorganisme, <b>mencair, dan mengalir keluar</b> dari kotak/tumpukan fermentasi.'
+      },
+      {
+        idx: 2,
+        icon: '🧱',
+        iconBg: 'bg-sky-100',
+        border: 'border-sky-700/30',
+        titleClass: 'text-sky-950',
+        title: '3. Tekstur dan Struktur Sel',
+        text: 'Penetrasi asam dan suhu panas merusak dinding sel bagian dalam biji. Akibatnya, tekstur biji berubah menjadi <b>lebih lunak</b> dan terbentuk <b>rongga-rongga kecil</b> di bagian dalam keping biji (tampak berongga saat dibelah).'
+      },
+      {
+        idx: 3,
+        icon: '🌡️',
+        iconBg: 'bg-orange-100',
+        border: 'border-orange-600/40',
+        titleClass: 'text-orange-950',
+        title: '4. Peningkatan Suhu Tumpukan',
+        text: 'Aktivitas metabolisme mikroorganisme menghasilkan <b>reaksi eksotermis</b> (melepaskan panas). Suhu tumpukan biji melonjak drastis dari suhu ruang (<b>± 28°C</b>) hingga mencapai titik puncak <b>40°C – 45°C</b> pada hari ke-2 hingga ke-3.'
+      }
+    ];
+
+    slideBodyHTML = `
+      <div class="parchment p-4 sm:p-5 space-y-3 my-auto">
+        <div class="flex flex-wrap items-start justify-between gap-2 border-b-2 border-amber-900/20 pb-2">
+          <div>
+            <span class="bg-sky-700 text-white text-xs font-extrabold px-3 py-1 rounded-full shadow-sm">SLIDE 3 · PERUBAHAN FISIKA</span>
+            <h3 class="text-lg sm:text-2xl font-extrabold text-amber-950 mt-1">4 Perubahan Fisika Utama Selama Fermentasi</h3>
+            <p class="text-xs sm:text-sm text-stone-800 mt-1">
+              <b>Perubahan fisika</b> adalah perubahan yang dapat diamati langsung oleh panca indra tanpa mengubah susunan molekul dasar secara langsung pada penampakan luarnya:
+            </p>
+          </div>
+          ${quickExpandControlsHTML}
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          ${fisikaItems.map(item => {
+            const key = `s3-${item.idx}`;
+            const isOpen = !!State.openStudyItems[key];
+            const det = STUDY_SLIDE_DETAILS.s3Fisika[item.idx];
+            return `
+              <div data-study-toggle="${key}" class="study-clickable bg-white rounded-xl p-3.5 border-2 ${isOpen ? 'border-sky-600 ring-2 ring-sky-400/45' : item.border} shadow-sm flex flex-col justify-between">
+                <div class="flex gap-3 items-start">
+                  <div class="text-2xl ${item.iconBg} p-2 rounded-xl shrink-0">${item.icon}</div>
+                  <div class="flex-1">
+                    <div class="flex flex-wrap items-center justify-between gap-1">
+                      <h4 class="font-extrabold ${item.titleClass} text-sm sm:text-base">${item.title}</h4>
+                      <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isOpen ? 'bg-sky-700 text-white' : 'bg-sky-100 text-sky-900'}">
+                        ${isOpen ? '▲ Tutup detail' : '👆 Klik untuk buka penjelasan & contoh'}
+                      </span>
+                    </div>
+                    <p class="text-xs text-stone-800 mt-1 leading-relaxed">${item.text}</p>
+                  </div>
+                </div>
+                ${isOpen ? renderDetailBoxHTML(det.penjelasan, det.contoh, 'border-sky-400/50 bg-sky-50/90') : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  } else if (State.studySlide === 4) {
+    const kimiaItems = [
+      {
+        idx: 0,
+        title: '1. Fluktuasi Nilai pH (Keasaman)',
+        text: 'Awal fermentasi pH sedikit asam (<b>± 5,6</b>). Hari ke-1 s.d. ke-4 <b>pH turun tajam</b> akibat asam laktat &amp; asam asetat. Hari ke-6 s.d. ke-7 pH naik kembali karena sebagian asam asetat menguap.'
+      },
+      {
+        idx: 1,
+        title: '2. Inaktivasi Embrio &amp; Aktivasi Enzim',
+        text: 'Suhu tinggi (<b>40°C – 45°C</b>) dan asam asetat membuat <b>embrio biji mati</b>. Membran sel pecah sehingga enzim <i>protease</i>, <i>invertase</i>, dan <i>polifenol oksidase</i> keluar dan aktif bereaksi.'
+      },
+      {
+        idx: 2,
+        title: '3. Pembentukan Prekursor Rasa',
+        text: 'Enzim <i>protease</i> memecah protein menjadi <b>asam amino</b>, sedangkan gula dipecah menjadi <b>gula pereduksi</b>. Kombinasi keduanya adalah <i>flavor precursors</i> (calon aroma cokelat saat disangrai).'
+      },
+      {
+        idx: 3,
+        title: '4. Penurunan Senyawa Polifenol',
+        text: 'Kadar senyawa <b>polifenol (tanin)</b> berkurang drastis <b>lebih dari 50%</b> akibat oksidasi. Penurunan ini menghilangkan rasa sepat (<i>astringency</i>) dan mengurangi pahit berlebih.'
+      }
+    ];
+
+    slideBodyHTML = `
+      <div class="parchment p-4 sm:p-5 space-y-3 my-auto">
+        <div class="flex flex-wrap items-start justify-between gap-2 border-b-2 border-amber-900/20 pb-2">
+          <div>
+            <span class="bg-purple-700 text-white text-xs font-extrabold px-3 py-1 rounded-full shadow-sm">SLIDE 4 · PERUBAHAN KIMIA</span>
+            <h3 class="text-lg sm:text-2xl font-extrabold text-amber-950 mt-1">4 Perubahan Kimia Pembentuk "Jiwa" Cita Rasa Cokelat</h3>
+            <p class="text-xs sm:text-sm text-stone-800 mt-1">
+              <b>Perubahan kimia</b> adalah perubahan yang menghasilkan zat-zat baru dan mengubah komposisi kimia di dalam biji kakao:
+            </p>
+          </div>
+          ${quickExpandControlsHTML}
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
+          <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            ${kimiaItems.map(item => {
+              const key = `s4-${item.idx}`;
+              const isOpen = !!State.openStudyItems[key];
+              const det = STUDY_SLIDE_DETAILS.s4Kimia[item.idx];
+              return `
+                <div data-study-toggle="${key}" class="study-clickable bg-white rounded-xl p-3 border-2 ${isOpen ? 'border-purple-700 ring-2 ring-purple-400/45' : 'border-purple-700/30'} shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div class="flex flex-wrap items-center justify-between gap-1">
+                      <h4 class="font-extrabold text-purple-950 text-xs sm:text-sm">${item.title}</h4>
+                      <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isOpen ? 'bg-purple-700 text-white' : 'bg-purple-100 text-purple-900'}">
+                        ${isOpen ? '▲ Tutup detail' : '👆 Klik untuk buka penjelasan & contoh'}
+                      </span>
+                    </div>
+                    <p class="text-[11px] sm:text-xs text-stone-800 mt-1 leading-relaxed">${item.text}</p>
+                  </div>
+                  ${isOpen ? renderDetailBoxHTML(det.penjelasan, det.contoh, 'border-purple-400/50 bg-purple-50/90') : ''}
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <div class="lg:col-span-5 bg-purple-50/90 rounded-xl p-3 border-2 border-purple-700/30 flex flex-col justify-center shadow-inner">
+            <div class="text-xs font-extrabold text-purple-950 text-center mb-1.5">📈 Grafik Fluktuasi Derajat Keasaman (pH)</div>
+            ${svgPhChart()}
+            <p class="text-[11px] text-purple-950 text-center mt-2 font-semibold">
+              Penurunan pH memicu kematian embrio biji sehingga reaksi enzimatis pembentuk aroma cokelat dapat berlangsung!
+            </p>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    const filteredRows = SUMMARY_ROWS
+      .map((r, originalIdx) => ({ ...r, originalIdx }))
+      .filter(r => State.studyFilter === 'all' || r.kategori === State.studyFilter);
+
+    slideBodyHTML = `
+      <div class="parchment p-4 sm:p-5 space-y-3 my-auto">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b-2 border-amber-900/20 pb-2">
+          <div>
+            <span class="bg-emerald-700 text-white text-xs font-extrabold px-3 py-1 rounded-full shadow-sm">SLIDE 5 · RANGKUMAN INFOGRAFIS</span>
+            <h3 class="text-lg sm:text-2xl font-extrabold text-amber-950 mt-1">Perbandingan Biji Kakao Sebelum &amp; Sesudah Fermentasi</h3>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-1.5">
+            ${quickExpandControlsHTML}
+            <button data-filter="all" class="card-lift px-3 py-1 rounded-full text-xs font-extrabold border-2 ${
+              State.studyFilter === 'all' ? 'bg-amber-800 text-white border-amber-950' : 'bg-white text-stone-700 border-stone-300'
+            }">Semua (6)</button>
+            <button data-filter="fisika" class="card-lift px-3 py-1 rounded-full text-xs font-extrabold border-2 ${
+              State.studyFilter === 'fisika' ? 'bg-sky-700 text-white border-sky-950' : 'bg-white text-stone-700 border-stone-300'
+            }">👁️ Perubahan Fisika</button>
+            <button data-filter="kimia" class="card-lift px-3 py-1 rounded-full text-xs font-extrabold border-2 ${
+              State.studyFilter === 'kimia' ? 'bg-purple-700 text-white border-purple-950' : 'bg-white text-stone-700 border-stone-300'
+            }">🧪 Perubahan Kimia</button>
+          </div>
+        </div>
+
+        <div class="text-[11px] font-bold text-amber-900 bg-amber-100/80 px-3 py-1.5 rounded-lg border border-amber-700/25">
+          👆 Klik salah satu baris aspek pengamatan pada tabel di bawah untuk melihat penjelasan ilmiah &amp; contoh nyatanya:
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border-2 border-amber-900/30 bg-white shadow-sm">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="bg-amber-900 text-amber-100">
+                <th class="p-2.5">Aspek Pengamatan</th>
+                <th class="p-2.5">Sebelum Fermentasi</th>
+                <th class="p-2.5">Sesudah Fermentasi (5–7 Hari)</th>
+                <th class="p-2.5 text-center">Jenis Perubahan</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-amber-900/15">
+              ${filteredRows.map(row => {
+                const rowKey = `s5-${row.originalIdx}`;
+                const isRowOpen = !!State.openStudyItems[rowKey];
+                return `
+                  <tr data-study-toggle="${rowKey}" class="cursor-pointer transition-colors ${isRowOpen ? 'bg-amber-100/90' : 'hover:bg-amber-50/90'}">
+                    <td class="p-2.5 font-extrabold text-amber-950">
+                      <div class="flex items-center justify-between gap-2">
+                        <span>${row.ikon} ${row.aspek}</span>
+                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0 ${isRowOpen ? 'bg-amber-800 text-white' : 'bg-amber-200/80 text-amber-950'}">
+                          ${isRowOpen ? '▲ Tutup detail' : '👆 Klik untuk buka penjelasan & contoh'}
+                        </span>
+                      </div>
+                    </td>
+                    <td class="p-2.5 text-stone-700">${row.sebelum}</td>
+                    <td class="p-2.5 font-bold text-emerald-900">${row.sesudah}</td>
+                    <td class="p-2.5 text-center">
+                      <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-extrabold ${row.badge}">
+                        ${row.jenis}
+                      </span>
+                    </td>
+                  </tr>
+                  ${isRowOpen ? `
+                    <tr class="bg-amber-50/75">
+                      <td colspan="4" class="p-3 border-t border-amber-900/15">
+                        <div class="accordion-open grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs">
+                          <div class="bg-white rounded-lg p-2.5 border border-amber-700/30 text-stone-800 leading-relaxed shadow-sm">
+                            <span class="font-extrabold text-amber-950">📖 Penjelasan Mendalam (${row.aspek}):</span> ${row.penjelasan}
+                          </div>
+                          <div class="bg-emerald-50/95 rounded-lg p-2.5 border border-emerald-600/35 text-emerald-950 leading-relaxed shadow-sm">
+                            <span class="font-extrabold text-emerald-900">💡 Contoh Pengamatan Nyata:</span> ${row.contoh}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ` : ''}
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bg-emerald-100 border-2 border-emerald-600 rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
+          <p class="text-xs sm:text-sm font-bold text-emerald-950 text-center sm:text-left">
+            🎉 Kamu sudah menyelesaikan seluruh materi Projek IPAS! Sekarang ayo praktikkan langsung di kotak fermentasi &amp; uji belah biji dengan Pisau Guillotine!
+          </p>
+          <button id="btn-slide5-sim" class="btn-3d btn-green px-5 py-2.5 text-xs sm:text-sm shrink-0 shadow-md">
+            🚀 Mulai Simulasi Fermentasi Sekarang!
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  screenEl.innerHTML = `
+    <header class="flex flex-wrap justify-between items-center gap-2">
+      <div class="wood-panel px-4 py-2 flex items-center gap-2.5">
+        <span class="text-xl sm:text-2xl">📖</span>
+        <div>
+          <h2 class="text-sm sm:text-lg font-bold text-yellow-300 leading-tight">Modul Materi Belajar: Zat dan Perubahannya</h2>
+          <p class="text-[11px] text-amber-100">Slide ${State.studySlide} dari 5 · Projek IPAS Fermentasi Kakao</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="btn-study-sim" class="btn-3d btn-green px-3.5 py-2 text-xs sm:text-sm">🧪 Langsung Simulasi</button>
+        <button id="btn-study-home" class="btn-3d btn-wood px-3 py-2 text-xs sm:text-sm">🏠 Menu</button>
+      </div>
+    </header>
+
+    <nav class="flex flex-wrap justify-center gap-1.5 my-2">
+      ${tabsHTML}
+    </nav>
+
+    ${slideBodyHTML}
+
+    <footer class="flex justify-between items-center gap-2 pt-2">
+      <button id="btn-prev-slide" ${State.studySlide === 1 ? 'disabled' : ''} class="btn-3d btn-wood px-4 py-2 text-xs sm:text-sm">
+        ◀ Slide Sebelumnya
+      </button>
+
+      <div class="flex gap-1.5">
+        ${[1, 2, 3, 4, 5].map(n => `<span class="w-2.5 h-2.5 rounded-full transition-all ${n === State.studySlide ? 'bg-yellow-300 scale-125 shadow-[0_0_8px_#fde047]' : 'bg-white/40'}"></span>`).join('')}
+      </div>
+
+      ${State.studySlide < 5 ? `
+        <button id="btn-next-slide" class="btn-3d btn-gold px-4 py-2 text-xs sm:text-sm">
+          Slide Berikutnya ▶
+        </button>
+      ` : `
+        <button id="btn-footer-sim" class="btn-3d btn-green px-4 py-2 text-xs sm:text-sm">
+          🚀 Masuk ke Simulasi ▶
+        </button>
+      `}
+    </footer>
+  `;
+
+  animateScreenEntry();
+  document.getElementById('btn-study-home').onclick = renderMenu;
+  document.getElementById('btn-study-sim').onclick = startFermentationStage;
+  document.getElementById('btn-prev-slide').onclick = () => renderStudyModule(State.studySlide - 1);
+
+  const btnExpandAll = document.getElementById('btn-expand-all-study');
+  if (btnExpandAll) btnExpandAll.onclick = () => setAllSlideItems(State.studySlide, true);
+
+  const btnCollapseAll = document.getElementById('btn-collapse-all-study');
+  if (btnCollapseAll) btnCollapseAll.onclick = () => setAllSlideItems(State.studySlide, false);
+
+  document.querySelectorAll('[data-study-toggle]').forEach(el => {
+    el.onclick = () => toggleStudyItem(el.dataset.studyToggle, State.studySlide);
+  });
+
+  const btnNext = document.getElementById('btn-next-slide');
+  if (btnNext) btnNext.onclick = () => renderStudyModule(State.studySlide + 1);
+
+  const btnFooterSim = document.getElementById('btn-footer-sim');
+  if (btnFooterSim) btnFooterSim.onclick = startFermentationStage;
+
+  const btnSlide5Sim = document.getElementById('btn-slide5-sim');
+  if (btnSlide5Sim) btnSlide5Sim.onclick = startFermentationStage;
+
+  document.querySelectorAll('[data-slide]').forEach(btn => {
+    btn.onclick = () => renderStudyModule(Number(btn.dataset.slide));
+  });
+
+  const tabAnaerob = document.getElementById('tab-anaerob');
+  const tabAerob = document.getElementById('tab-aerob');
+  const cardAnaerob = document.getElementById('card-anaerob');
+  const cardAerob = document.getElementById('card-aerob');
+  if (tabAnaerob) tabAnaerob.onclick = () => {
+    State.studyFaseTab = 'anaerob';
+    State.openStudyItems['s2-anaerob'] = true;
+    playWoodClickSound(true);
+    renderStudyModule(2);
+  };
+  if (tabAerob) tabAerob.onclick = () => {
+    State.studyFaseTab = 'aerob';
+    State.openStudyItems['s2-aerob'] = true;
+    playWoodClickSound(true);
+    renderStudyModule(2);
+  };
+  if (cardAnaerob) cardAnaerob.onclick = () => {
+    State.studyFaseTab = 'anaerob';
+    toggleStudyItem('s2-anaerob', 2);
+  };
+  if (cardAerob) cardAerob.onclick = () => {
+    State.studyFaseTab = 'aerob';
+    toggleStudyItem('s2-aerob', 2);
+  };
+
+  document.querySelectorAll('[data-filter]').forEach(btn => {
+    btn.onclick = () => {
+      State.studyFilter = btn.dataset.filter;
+      renderStudyModule(5);
+    };
+  });
+}
+
+// ============================================================================
+// LOGIKA PENENTUAN HASIL FERMENTASI (5 SAMPEL BIJI)
+// ============================================================================
+function computeCutTestSamples() {
+  const { day, temp, turnsDone, totalTurns } = State;
+  const turnedDay2 = turnsDone.includes(2);
+  const turnedDay4 = turnsDone.includes(4);
+
+  if (totalTurns >= 4) {
+    return ['moldy', 'moldy', 'moldy', 'partly', 'brown'].map((t, i) => ({ id: i, type: t, cut: false, justCut: false }));
+  }
+
+  if (totalTurns === 0 && day >= 4) {
+    return ['slaty', 'slaty', 'slaty', 'purple', 'partly'].map((t, i) => ({ id: i, type: t, cut: false, justCut: false }));
+  }
+
+  if (day <= 3 || temp < 38) {
+    return ['purple', 'purple', 'purple', 'slaty', 'partly'].map((t, i) => ({ id: i, type: t, cut: false, justCut: false }));
+  }
+
+  if (day === 6 && turnedDay2 && turnedDay4 && temp >= 45 && temp <= 50) {
+    return ['brown', 'brown', 'brown', 'brown', 'brown'].map((t, i) => ({ id: i, type: t, cut: false, justCut: false }));
+  }
+
+  return ['partly', 'partly', 'brown', 'brown', 'purple'].map((t, i) => ({ id: i, type: t, cut: false, justCut: false }));
+}
+
+// ============================================================================
+// 3. SIMULASI KOTAK FERMENTASI 6 HARI (100% KONTROL MANUAL PENGGUNA)
+// ============================================================================
+function startFermentationStage() {
+  clearCutTimers();
+  State.day = 1;
+  State.temp = 28;
+  State.tempHistory = [28];
+  State.ph = 5.6;
+  State.pulpLevel = 100;
+  State.turnsDone = [];
+  State.totalTurns = 0;
+  State.leafClosed = true;
+
+  renderFermentationStage(true);
+}
+
+function advanceDay() {
+  if (State.day >= 6) return;
+
+  if ((State.day === 2 || State.day === 4) && !State.turnsDone.includes(State.day)) {
+    showToast(`⚠️ Kamu melewatkan pembalikan Hari ke-${State.day}! Aerasi oksigen & suhu menjadi kurang optimal.`, 'warn');
+  }
+
+  State.day++;
+
+  if (State.day === 2) {
+    State.temp = State.leafClosed ? 42 : 36;
+    State.ph = 4.9;
+    State.pulpLevel = 72;
+  } else if (State.day === 3) {
+    State.temp = State.turnsDone.includes(2) ? (State.leafClosed ? 48 : 42) : 34;
+    State.ph = 4.4;
+    State.pulpLevel = 45;
+  } else if (State.day === 4) {
+    State.temp = State.turnsDone.includes(2) ? (State.leafClosed ? 47 : 41) : 33;
+    State.ph = 4.3;
+    State.pulpLevel = 25;
+  } else if (State.day >= 5) {
+    State.ph = State.day === 5 ? 4.6 : 4.9;
+    State.pulpLevel = State.day === 5 ? 12 : 5;
+    if (State.turnsDone.includes(2) && State.turnsDone.includes(4)) {
+      State.temp = State.leafClosed ? 48 : 43;
+    } else if (State.turnsDone.length > 0) {
+      State.temp = State.leafClosed ? 41 : 36;
+    } else {
+      State.temp = 31;
+    }
+  }
+
+  State.tempHistory.push(State.temp);
+
+  if (State.day === 6) {
+    showToast('🏁 Fermentasi mencapai Hari ke-6! Silakan tekan tombol "Lanjut ke Uji Belah Biji (Cut Test)" jika sudah siap.');
+  } else {
+    showToast(`📅 Memasuki Hari ke-${State.day}. Pilih tindakan hari ini sebelum menekan "Lanjut Hari ke-${State.day + 1}".`);
+  }
+
+  renderFermentationStage(false);
+}
+
+function svgMiniTempGraph() {
+  const pts = State.tempHistory.map((t, idx) => {
+    const x = 22 + idx * 42;
+    const y = 62 - ((t - 25) / 30) * 48;
+    return `${x},${Math.max(8, Math.min(62, y))}`;
+  }).join(' ');
+
+  return `<svg viewBox="0 0 260 72" class="w-full h-16 bg-black/35 rounded-xl border border-amber-900/50 p-1 shadow-inner">
+    <rect x="18" y="14" width="225" height="10" fill="#10b981" opacity="0.24"/>
+    <text x="240" y="22" text-anchor="end" font-size="8" fill="#6ee7b7" font-weight="bold">45–50°C</text>
+    <polyline fill="none" stroke="#facc15" stroke-width="2.5" points="${pts}"/>
+    ${State.tempHistory.map((t, idx) => {
+      const x = 22 + idx * 42;
+      const y = Math.max(8, Math.min(62, 62 - ((t - 25) / 30) * 48));
+      return `<circle cx="${x}" cy="${y}" r="3.2" fill="#fff" stroke="#b45309" stroke-width="1.5"/>`;
+    }).join('')}
+  </svg>`;
+}
+
+function renderFermentationStage(withTransition = false) {
+  appEl.className = 'w-full max-w-[1140px] rounded-2xl overflow-hidden shadow-2xl border-4 border-[#361c08] bg-shed flex flex-col justify-between min-h-[640px]';
+
+  let timelineHTML = '';
+  for (let d = 1; d <= 6; d++) {
+    const isCurrent = d === State.day;
+    const isPast = d < State.day;
+    const turned = State.turnsDone.includes(d);
+    const ideal = d === 2 || d === 4;
+
+    timelineHTML += `
+      <div class="card-lift flex flex-col items-center p-1.5 rounded-xl border-2 text-center ${
+        isCurrent ? 'bg-amber-300/30 border-yellow-300 scale-[1.03] shadow-lg' : isPast ? 'bg-black/30 border-amber-900/60 opacity-85' : 'bg-black/20 border-amber-950/50 opacity-60'
+      }">
+        <span class="text-[11px] font-extrabold text-amber-200">Hari ${d}</span>
+        <span class="text-sm sm:text-base my-0.5">${turned ? '🔄' : ideal ? '⭐' : '📦'}</span>
+        <span class="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded ${
+          turned ? 'bg-emerald-600 text-white' : ideal ? 'bg-amber-600 text-white' : 'bg-stone-700 text-stone-200'
+        }">${turned ? 'Dibalik' : ideal ? 'Jadwal Balik' : 'Diamkan'}</span>
+      </div>
+    `;
+  }
+
+  const isAnaerobPhase = State.day <= 2;
+  const isIdealTemp = State.temp >= 45 && State.temp <= 50;
+  const isTurnScheduleDay = State.day === 2 || State.day === 4;
+  const alreadyTurnedToday = State.turnsDone.includes(State.day);
+
+  screenEl.innerHTML = `
+    <header class="flex flex-wrap justify-between items-center gap-2">
+      <div class="wood-panel px-4 py-2 flex items-center gap-3">
+        <span class="text-2xl">📦</span>
+        <div>
+          <h2 class="text-base sm:text-xl font-bold text-yellow-300 leading-tight">Simulasi Kotak Fermentasi 6 Hari</h2>
+          <p class="text-xs text-amber-100">Balik biji tepat <b>2x (Hari ke-2 &amp; ke-4)</b> dan jaga suhu ideal <b>45°C–50°C</b></p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="btn-ferm-study" class="btn-3d btn-gold px-3 py-2 text-xs sm:text-sm">📖 Materi</button>
+        <button id="btn-ferm-home" class="btn-3d btn-wood px-3 py-2 text-xs sm:text-sm">🏠 Menu</button>
+      </div>
+    </header>
+
+    <div class="grid grid-cols-6 gap-1.5 sm:gap-2 my-2">
+      ${timelineHTML}
+    </div>
+
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center my-auto">
+      <div class="lg:col-span-7 flex flex-col items-center">
+        ${svgFermentBox(State.temp, State.leafClosed, State.day)}
+        <div class="mt-2 bg-black/55 px-4 py-1.5 rounded-full text-xs text-amber-100 border border-amber-700/50 text-center max-w-lg shadow-md">
+          ${getHintMessage()}
+        </div>
+      </div>
+
+      <div class="lg:col-span-5 wood-panel p-4 space-y-2.5">
+        <div class="flex justify-between items-center border-b border-amber-700/50 pb-2">
+          <span class="font-bold text-amber-200 text-sm">Hari ke-${State.day} / 6</span>
+          <span class="text-xs px-2.5 py-0.5 rounded-full font-extrabold shadow-sm ${
+            isAnaerobPhase ? 'bg-purple-700 text-white' : 'bg-sky-700 text-white'
+          }">
+            ${isAnaerobPhase ? '🫧 Fase Anaerob (Khamir)' : '🌬️ Fase Aerob (Acetobacter)'}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+          <div class="bg-black/35 p-2 rounded-xl border border-amber-900/50 shadow-inner">
+            <div class="text-[10px] text-amber-200">Suhu</div>
+            <div class="font-extrabold text-sm ${isIdealTemp ? 'text-emerald-400' : 'text-yellow-300'}">${State.temp}°C</div>
+          </div>
+          <div class="bg-black/35 p-2 rounded-xl border border-amber-900/50 shadow-inner">
+            <div class="text-[10px] text-amber-200">Derajat pH</div>
+            <div class="font-extrabold text-sm text-sky-300">${State.ph.toFixed(1)}</div>
+          </div>
+          <div class="bg-black/35 p-2 rounded-xl border border-amber-900/50 shadow-inner">
+            <div class="text-[10px] text-amber-200">Sisa Pulp</div>
+            <div class="font-extrabold text-sm text-amber-200">${State.pulpLevel}%</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-[10px] text-amber-200 font-bold mb-1">
+            <span>📈 Grafik Suhu Eksotermis</span>
+            <span>Pembalikan: ${State.totalTurns}x (Ideal: 2x)</span>
+          </div>
+          ${svgMiniTempGraph()}
+        </div>
+
+        <div class="grid grid-cols-1 gap-2">
+          <button id="btn-turn-beans" class="btn-3d btn-blue py-2 px-4 text-xs sm:text-sm ${
+            isTurnScheduleDay && !alreadyTurnedToday ? 'ring-2 ring-yellow-300 animate-pulse' : ''
+          }">
+            🔄 Balik / Aduk Biji (Aerasi O₂) ${alreadyTurnedToday ? '✓' : isTurnScheduleDay ? '⭐' : ''}
+          </button>
+
+          <button id="btn-toggle-leaf" class="btn-3d btn-wood py-2 px-4 text-xs sm:text-sm">
+            🍃 ${State.leafClosed ? 'Buka Daun Pisang (−3°C)' : 'Tutup Rapat Daun Pisang (+3°C)'}
+          </button>
+        </div>
+
+        <div class="border-t border-amber-700/50 pt-2.5 flex flex-col gap-2">
+          ${State.day < 6 ? `
+            <div class="bg-black/35 border border-amber-500/40 rounded-xl px-3 py-1.5 text-center text-[11px] text-amber-100 leading-snug">
+              ✋ <b>Mode Kontrol Manual:</b> Pilih tindakan Hari ke-${State.day} di atas terlebih dahulu, lalu tekan tombol di bawah untuk berpindah hari.
+            </div>
+            <button id="btn-next-day" class="btn-3d btn-green py-2.5 px-4 text-xs sm:text-sm w-full shadow-md">
+              ⏭ Lanjut Hari ke-${State.day + 1}
+            </button>
+            <button id="btn-go-cuttest" class="btn-3d btn-wood py-2 px-4 text-xs w-full">
+              🔪 Akhiri Lebih Awal &amp; Uji Belah Biji (Cut Test)
+            </button>
+          ` : `
+            <div class="bg-emerald-950/70 border border-emerald-400/60 rounded-xl px-3 py-2 text-center text-[11px] text-emerald-200 leading-snug">
+              ✅ <b>Hari ke-6 Selesai!</b> Tekan tombol di bawah apabila kamu sudah siap menuju laboratorium pembelahan biji.
+            </div>
+            <button id="btn-go-cuttest" class="btn-3d btn-gold py-2.5 px-4 text-xs sm:text-sm w-full shadow-md">
+              🔪 Lanjut ke Uji Belah Biji (Cut Test) ▶
+            </button>
+          `}
+        </div>
+      </div>
+    </section>
+  `;
+
+  if (withTransition) animateScreenEntry();
+  document.getElementById('btn-ferm-home').onclick = renderMenu;
+  document.getElementById('btn-ferm-study').onclick = () => renderStudyModule(1);
+
+  document.getElementById('btn-turn-beans').onclick = () => {
+    State.totalTurns++;
+    if (!State.turnsDone.includes(State.day)) {
+      State.turnsDone.push(State.day);
+    }
+    State.leafClosed = true;
+
+    if (State.totalTurns >= 4) {
+      State.temp = Math.max(35, State.temp - 4);
+      showToast('⚠️ Terlalu sering membalik (≥4x)! Spora jamur berisiko mengontaminasi biji.', 'err');
+    } else if (State.day === 2 || State.day === 4) {
+      State.temp = Math.min(49, Math.max(46, State.temp + 4));
+      showToast(`✅ Pembalikan Hari ke-${State.day} tepat! Oksigen masuk & suhu naik ideal ke ${State.temp}°C.`);
+    } else {
+      State.temp = Math.max(36, State.temp - 3);
+      showToast(`⚠️ Hari ke-${State.day} bukan jadwal utama pembalikan! Suhu turun ke ${State.temp}°C.`, 'warn');
+    }
+    State.tempHistory[State.tempHistory.length - 1] = State.temp;
+    renderFermentationStage(false);
+  };
+
+  document.getElementById('btn-toggle-leaf').onclick = () => {
+    State.leafClosed = !State.leafClosed;
+    State.temp = State.leafClosed ? Math.min(52, State.temp + 3) : Math.max(30, State.temp - 3);
+    State.tempHistory[State.tempHistory.length - 1] = State.temp;
+    showToast(State.leafClosed ? '🍃 Daun pisang ditutup rapat untuk menjaga panas.' : '💨 Daun dibuka sedikit untuk melepas panas.');
+    renderFermentationStage(false);
+  };
+
+  const btnNext = document.getElementById('btn-next-day');
+  if (btnNext) btnNext.onclick = () => advanceDay();
+
+  document.getElementById('btn-go-cuttest').onclick = () => {
+    State.samples = computeCutTestSamples();
+    State.cutCount = 0;
+    State.selectedSampleIdx = 0;
+    State.isChopping = false;
+    State.batchCutRunning = false;
+    renderCutTestStage(true);
+  };
+}
+
+function getHintMessage() {
+  if (State.totalTurns >= 4) return '⚠️ Peringatan: Terlalu sering membuka & membalik biji memicu kontaminasi jamur!';
+  if (State.day === 1) return 'Hari 1 (Fase Anaerob): Khamir memecah gula pulp menjadi alkohol & CO₂. Biarkan tertutup, lalu tekan "Lanjut Hari ke-2".';
+  if (State.day === 2) return State.turnsDone.includes(2)
+    ? 'Bagus! Pembalikan pertama (Hari ke-2) selesai. Tekan "Lanjut Hari ke-3" untuk masuk ke Fase Aerob.'
+    : '⭐ Jadwal Pembalikan Pertama! Klik "Balik / Aduk Biji" dulu sebelum menekan "Lanjut Hari ke-3".';
+  if (State.day === 3) return 'Hari 3 (Fase Aerob): Bakteri Acetobacter menghasilkan panas puncak (45–50°C) & menurunkan pH.';
+  if (State.day === 4) return State.turnsDone.includes(4)
+    ? 'Mantap! Pembalikan kedua (Hari ke-4) selesai. Tekan "Lanjut Hari ke-5" untuk melanjutkan.'
+    : '⭐ Jadwal Pembalikan Kedua! Klik "Balik / Aduk Biji" dulu sebelum menekan "Lanjut Hari ke-5".';
+  if (State.day === 5) return 'Hari 5: Lendir pulp hampir habis & reaksi enzimatis berlangsung. Tekan "Lanjut Hari ke-6".';
+  return 'Hari 6: Fermentasi selesai! Tekan "Lanjut ke Uji Belah Biji (Cut Test)" untuk memeriksa keping biji.';
+}
+
+// ============================================================================
+// 4. LABORATORIUM BELAHAN BIJI VIRTUAL DENGAN ALAT PISAU GUILLOTINE
+// ============================================================================
+function executeGuillotineCut(idx, onComplete = null) {
+  if (State.isChopping) return;
+  const targetSample = State.samples[idx];
+  if (!targetSample) return;
+
+  State.selectedSampleIdx = idx;
+  State.samples.forEach(s => { s.justCut = false; });
+
+  // Jika biji sudah pernah dibelah, cukup tampilkan di dudukan guillotine
+  if (targetSample.cut) {
+    renderCutTestStage(false);
+    if (onComplete) onComplete();
+    return;
+  }
+
+  // Jalankan animasi pisau guillotine turun membelah biji
+  State.isChopping = true;
+  targetSample.cut = true;
+  targetSample.justCut = true;
+  State.cutCount++;
+
+  playGuillotineSound();
+  renderCutTestStage(false);
+
+  chopTimeout = setTimeout(() => {
+    State.isChopping = false;
+    renderCutTestStage(false);
+    if (onComplete) onComplete();
+  }, 680);
+}
+
+function renderCutTestStage(withTransition = false) {
+  appEl.className = 'w-full max-w-[1140px] rounded-2xl overflow-hidden shadow-2xl border-4 border-[#361c08] bg-lab flex flex-col justify-between min-h-[640px]';
+
+  const allCut = State.cutCount >= State.samples.length;
+  const activeIdx = State.selectedSampleIdx !== null ? State.selectedSampleIdx : 0;
+  const activeSample = State.samples[activeIdx];
+  const selInfo = activeSample && activeSample.cut && !State.isChopping ? BEAN_CATEGORIES[activeSample.type] : null;
+
+  screenEl.innerHTML = `
+    <header class="flex flex-wrap justify-between items-center gap-2">
+      <div class="wood-panel px-4 py-2 flex items-center gap-3">
+        <span class="text-2xl">🔪</span>
+        <div>
+          <h2 class="text-base sm:text-xl font-bold text-yellow-300 leading-tight">Laboratorium Belahan Biji Virtual (Cut Test)</h2>
+          <p class="text-xs text-amber-100">Letakkan sampel biji ke <b>Alat Pisau Guillotine</b> lalu tekan gagang pisau untuk membelahnya!</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div class="wood-panel px-3 py-1.5 text-xs sm:text-sm font-bold text-amber-200">
+          Terbelah: <span class="text-yellow-300">${State.cutCount} / ${State.samples.length}</span>
+        </div>
+        <button id="btn-cut-home" class="btn-3d btn-wood px-3 py-2 text-xs sm:text-sm">🏠 Menu</button>
+      </div>
+    </header>
+
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch my-auto py-3">
+      <!-- Kolom Kiri: Stasiun Alat Pisau Guillotine & Baki 5 Sampel -->
+      <div class="lg:col-span-7 cut-board p-3.5 sm:p-4 flex flex-col justify-between space-y-3">
+        <div class="flex flex-wrap justify-between items-center gap-2">
+          <span class="bg-[#2b1405]/90 text-amber-200 px-3 py-1 rounded-full text-xs font-bold border border-amber-700 shadow">
+            🪵 Meja Uji Belah Longitudinal (SNI 2323:2008)
+          </span>
+          <button id="btn-cut-all" ${allCut || State.isChopping || State.batchCutRunning ? 'disabled' : ''} class="btn-3d btn-gold px-3 py-1 text-xs">
+            ${State.batchCutRunning ? '⏳ Memotong Berurutan...' : '⚡ Belah Semua dengan Guillotine'}
+          </button>
+        </div>
+
+        <!-- Stasiun Pemotong Pisau Guillotine Interaktif -->
+        <div class="bg-black/25 rounded-2xl p-2.5 border-2 border-amber-950/60 flex flex-col items-center shadow-inner">
+          ${svgGuillotineStation(activeSample, activeIdx, State.isChopping)}
+
+          <div class="mt-2 flex flex-wrap justify-center gap-2 w-full">
+            <button id="btn-press-guillotine" ${activeSample.cut || State.isChopping || State.batchCutRunning ? 'disabled' : ''} class="btn-3d btn-red px-5 py-2 text-xs sm:text-sm shadow-lg ${!activeSample.cut && !State.isChopping ? 'ring-2 ring-yellow-300' : ''}">
+              ${State.isChopping ? '⚙️ Bilah Pisau Memotong...' : activeSample.cut ? `✓ Sampel #${activeIdx + 1} Sudah Terbelah` : `🔪 Tekan Gagang Pisau Guillotine (Sampel #${activeIdx + 1})`}
+            </button>
+          </div>
+        </div>
+
+        <!-- Baki 5 Sampel Biji Kakao -->
+        <div>
+          <div class="text-[11px] text-amber-100 font-bold mb-1.5 text-center drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]">
+            👇 Klik sampel biji di baki untuk memasukkannya ke dudukan Pisau Guillotine &amp; membelahnya:
+          </div>
+          <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
+            ${State.samples.map((item, idx) => {
+              const info = BEAN_CATEGORIES[item.type];
+              const isSelected = activeIdx === idx;
+              return `
+                <div data-sample="${idx}" class="card-lift cursor-pointer rounded-xl p-1.5 sm:p-2 flex flex-col items-center justify-center transition-all border-2 ${
+                  isSelected ? 'bg-amber-200/40 border-yellow-300 scale-[1.04] shadow-lg' : 'bg-black/30 border-amber-950/60 hover:bg-black/45'
+                }">
+                  ${svgBeanTrayItem(item.type, item.cut, item.justCut)}
+                  <span class="mt-1 text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.5 rounded-full text-center leading-tight ${
+                    item.cut ? info.badgeClass : 'bg-stone-800 text-amber-200'
+                  }">
+                    ${item.cut ? info.sniBadge : `Biji #${idx + 1}`}
+                  </span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <div class="text-center text-xs text-amber-100 font-semibold drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
+          Parameter batch ini: Fermentasi <b>${State.day} Hari</b> · Pembalikan <b>${State.totalTurns}x</b> · Suhu Akhir <b>${State.temp}°C</b>
+        </div>
+      </div>
+
+      <!-- Kolom Kanan: Panel Analisis Mikroskop Kotiledon -->
+      <div class="lg:col-span-5 parchment p-4 flex flex-col justify-between">
+        ${selInfo ? `
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between gap-2 border-b-2 border-amber-900/20 pb-2">
+              <span class="text-xs font-extrabold uppercase text-amber-800">Penampang Keping Biji #${activeIdx + 1}</span>
+              <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${selInfo.badgeClass}">${selInfo.sniBadge}</span>
+            </div>
+
+            <h3 class="text-lg font-extrabold text-amber-950">${selInfo.title}</h3>
+
+            <div class="bg-amber-950/10 rounded-xl p-2 flex justify-center shadow-inner">
+              ${svgBeanTrayItem(activeSample.type, true, false)}
+            </div>
+
+            <div class="space-y-2 text-xs sm:text-sm">
+              <div class="bg-white/80 p-2.5 rounded-lg border border-amber-900/20 shadow-sm">
+                <b class="text-amber-950">⚗️ Klasifikasi Perubahan:</b> <span class="font-bold text-amber-800">${selInfo.changeType}</span>
+                <p class="text-stone-800 mt-1">${selInfo.science}</p>
+              </div>
+              <div class="bg-white/80 p-2.5 rounded-lg border border-amber-900/20 shadow-sm">
+                <b class="text-amber-950">👅 Dampak Mutu &amp; Cita Rasa:</b>
+                <p class="text-stone-800 mt-0.5">${selInfo.flavor}</p>
+              </div>
+            </div>
+          </div>
+        ` : `
+          <div class="my-auto text-center space-y-3 py-6">
+            <div class="text-5xl">⚙️🔪</div>
+            <h3 class="text-lg font-extrabold text-amber-950">Sampel #${activeIdx + 1} Siap Dibelah</h3>
+            <p class="text-xs sm:text-sm text-stone-700 leading-relaxed">
+              Sampel biji kakao sudah berada di dalam dudukan <b>Alat Pisau Guillotine</b>. Tekan tombol merah <b>"Tekan Gagang Pisau Guillotine"</b> atau klik langsung sampel biji di baki untuk menurunkan bilah pisau dan mengamati penampang dalam keping biji (<i>kotiledon</i>).
+            </p>
+          </div>
+        `}
+
+        <div class="pt-3 mt-2 border-t-2 border-amber-900/20 flex flex-col gap-2">
+          <button id="btn-to-report" ${!allCut || State.isChopping || State.batchCutRunning ? 'disabled' : ''} class="btn-3d btn-green py-2.5 px-4 text-xs sm:text-sm w-full">
+            ${allCut ? '📊 Lanjut ke Galeri Perbandingan & Kuis SNI' : `Belah Semua Biji Dulu (${State.cutCount}/${State.samples.length})`}
+          </button>
+          <button id="btn-retry-ferm" class="btn-3d btn-wood py-2 px-4 text-xs w-full">
+            ⟳ Ulangi Pengaturan Fermentasi
+          </button>
+        </div>
+      </div>
+    </section>
+  `;
+
+  if (withTransition) animateScreenEntry();
+  document.getElementById('btn-cut-home').onclick = renderMenu;
+  document.getElementById('btn-retry-ferm').onclick = startFermentationStage;
+
+  // Tombol Tekan Gagang Pisau Guillotine
+  const btnGuillotine = document.getElementById('btn-press-guillotine');
+  if (btnGuillotine) {
+    btnGuillotine.onclick = () => {
+      if (State.isChopping || State.batchCutRunning) return;
+      executeGuillotineCut(activeIdx);
+    };
+  }
+
+  // Klik pada salah satu dari 5 sampel di baki
+  document.querySelectorAll('[data-sample]').forEach(card => {
+    card.onclick = () => {
+      if (State.isChopping || State.batchCutRunning) return;
+      const idx = Number(card.dataset.sample);
+      executeGuillotineCut(idx);
+    };
+  });
+
+  // Tombol Belah Semua dengan Guillotine secara berurutan
+  document.getElementById('btn-cut-all').onclick = () => {
+    if (State.isChopping || State.batchCutRunning || allCut) return;
+    State.batchCutRunning = true;
+
+    const cutNextRemaining = () => {
+      const nextIdx = State.samples.findIndex(s => !s.cut);
+      if (nextIdx === -1) {
+        State.batchCutRunning = false;
+        renderCutTestStage(false);
+        showToast('✅ Seluruh 5 sampel biji berhasil dibelah dengan Pisau Guillotine!');
+        return;
+      }
+      executeGuillotineCut(nextIdx, () => {
+        setTimeout(cutNextRemaining, 160);
+      });
+    };
+
+    cutNextRemaining();
+  };
+
+  document.getElementById('btn-to-report').onclick = () => {
+    clearCutTimers();
+    const brownCount = State.samples.filter(s => s.type === 'brown').length;
+    const batchPts = brownCount * 20;
+    State.totalScore = Math.max(State.totalScore, batchPts);
+    State.quizIdx = 0;
+    State.quizScore = 0;
+    State.quizAnswered = false;
+    renderGalleryAndQuiz('brown', true);
+  };
+}
+
+// ============================================================================
+// 5. GALERI PERBANDINGAN 5 BELAHAN & KUIS REFLEKSI
+// ============================================================================
+function renderGalleryAndQuiz(selectedType = 'brown', withTransition = true) {
+  clearCutTimers();
+  State.gallerySelected = selectedType;
+  appEl.className = 'w-full max-w-[1140px] rounded-2xl overflow-hidden shadow-2xl border-4 border-[#361c08] bg-tropical flex flex-col justify-between min-h-[640px]';
+
+  const keys = ['purple', 'partly', 'brown', 'slaty', 'moldy'];
+  const activeCat = BEAN_CATEGORIES[selectedType];
+  const currentQuiz = QUIZ_QUESTIONS[State.quizIdx];
+
+  const hasBatch = State.samples && State.samples.length > 0;
+  const brownCount = hasBatch ? State.samples.filter(s => s.type === 'brown').length : 0;
+
+  screenEl.innerHTML = `
+    <header class="flex flex-wrap justify-between items-center gap-2">
+      <div class="wood-panel px-4 py-2 flex items-center gap-3">
+        <span class="text-2xl">🔬</span>
+        <div>
+          <h2 class="text-base sm:text-xl font-bold text-yellow-300 leading-tight">Galeri Standar Mutu Cut Test (SNI) &amp; Kuis IPAS</h2>
+          <p class="text-xs text-amber-100">Bandingkan 5 standar visual belahan biji kakao dan uji pemahamanmu!</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div class="wood-panel px-3 py-1.5 text-xs sm:text-sm font-bold text-amber-200">
+          ⭐ Total Skor: <span class="text-yellow-300">${State.totalScore + State.quizScore}</span>
+        </div>
+        <button id="btn-gal-study" class="btn-3d btn-gold px-3 py-2 text-xs sm:text-sm">📖 Materi</button>
+        <button id="btn-gal-home" class="btn-3d btn-wood px-3 py-2 text-xs sm:text-sm">🏠 Menu</button>
+      </div>
+    </header>
+
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch my-auto py-3">
+      <div class="lg:col-span-7 parchment p-4 flex flex-col justify-between space-y-3">
+        <div>
+          <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
+            <h3 class="font-extrabold text-amber-950 text-sm sm:text-base">📊 Klik Warna Keping Biji untuk Membandingkan:</h3>
+            ${hasBatch ? `<span class="text-xs bg-emerald-100 text-emerald-900 border border-emerald-400 px-2.5 py-0.5 rounded-full font-bold shadow-sm">Hasil Simulasimu: ${brownCount}/5 Mutu AA</span>` : ''}
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            ${keys.map(k => {
+              const item = BEAN_CATEGORIES[k];
+              const isSel = k === selectedType;
+              return `
+                <div data-gal="${k}" class="card-lift cursor-pointer rounded-xl p-2 flex flex-col items-center text-center border-2 transition-all ${
+                  isSel ? 'bg-amber-200 border-amber-700 scale-[1.03] shadow-md' : 'bg-white/75 border-amber-900/20 hover:bg-amber-50'
+                }">
+                  <div class="w-full max-w-[96px]">${svgBeanTrayItem(k, true, false)}</div>
+                  <span class="mt-1 text-[10px] font-extrabold leading-tight px-1.5 py-0.5 rounded-full ${item.badgeClass}">
+                    ${item.sniBadge}
+                  </span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <div class="bg-white/85 rounded-xl p-3 border-2 border-amber-900/20 space-y-1.5 text-xs sm:text-sm shadow-sm">
+          <div class="flex flex-wrap justify-between items-center gap-1">
+            <h4 class="font-extrabold text-amber-950 text-base">${activeCat.title}</h4>
+            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${activeCat.badgeClass}">${activeCat.changeType}</span>
+          </div>
+          <p class="text-stone-800"><b>Analisis Sains:</b> ${activeCat.science}</p>
+          <p class="text-stone-800"><b>Cita Rasa &amp; Mutu:</b> ${activeCat.flavor}</p>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5 wood-panel p-4 flex flex-col justify-between space-y-3">
+        <div>
+          <div class="flex justify-between items-center border-b border-amber-700/50 pb-2 mb-2">
+            <span class="font-extrabold text-yellow-300 text-sm">🧠 Kuis Refleksi Projek IPAS</span>
+            <span class="text-xs bg-black/40 px-2.5 py-0.5 rounded-full text-amber-200 font-bold">
+              Soal ${State.quizIdx + 1} / ${QUIZ_QUESTIONS.length}
+            </span>
+          </div>
+
+          <p class="text-xs sm:text-sm font-bold text-white leading-relaxed mb-3">
+            ${currentQuiz.q}
+          </p>
+
+          <div class="space-y-2" id="quiz-choices">
+            ${currentQuiz.opts.map((optText, i) => `
+              <button data-qopt="${i}" class="card-lift w-full text-left p-2.5 rounded-xl text-xs sm:text-sm font-bold border-2 transition-all bg-[#fff8eb] text-[#3b1e08] border-amber-900 hover:bg-amber-100 shadow-sm">
+                ${String.fromCharCode(65 + i)}. ${optText}
+              </button>
+            `).join('')}
+          </div>
+
+          <div id="quiz-feedback" class="hidden mt-3 p-2.5 rounded-xl text-xs leading-relaxed font-semibold bg-black/45 border border-amber-400/50 text-amber-100"></div>
+        </div>
+
+        <div class="pt-2 border-t border-amber-700/50 flex flex-wrap gap-2 justify-between">
+          <button id="btn-gal-sim" class="btn-3d btn-green px-4 py-2 text-xs sm:text-sm flex-1">
+            🔄 Main Simulasi Lagi
+          </button>
+          <button id="btn-next-quiz" class="btn-3d btn-gold px-4 py-2 text-xs sm:text-sm hidden">
+            Soal Berikutnya ▶
+          </button>
+        </div>
+      </div>
+    </section>
+  `;
+
+  if (withTransition) animateScreenEntry();
+  document.getElementById('btn-gal-home').onclick = renderMenu;
+  document.getElementById('btn-gal-study').onclick = () => renderStudyModule(1);
+  document.getElementById('btn-gal-sim').onclick = startFermentationStage;
+
+  document.querySelectorAll('[data-gal]').forEach(el => {
+    el.onclick = () => renderGalleryAndQuiz(el.dataset.gal, false);
+  });
+
+  document.querySelectorAll('[data-qopt]').forEach(btn => {
+    btn.onclick = () => {
+      if (State.quizAnswered) return;
+      State.quizAnswered = true;
+      const chosen = Number(btn.dataset.qopt);
+      const isRight = chosen === currentQuiz.ans;
+
+      document.querySelectorAll('[data-qopt]').forEach((b, idx) => {
+        if (idx === currentQuiz.ans) {
+          b.className = 'w-full text-left p-2.5 rounded-xl text-xs sm:text-sm font-bold border-2 bg-emerald-600 text-white border-emerald-900 shadow-md';
+        } else if (idx === chosen && !isRight) {
+          b.className = 'w-full text-left p-2.5 rounded-xl text-xs sm:text-sm font-bold border-2 bg-red-600 text-white border-red-900 shadow-md';
+        }
+      });
+
+      const fb = document.getElementById('quiz-feedback');
+      fb.classList.remove('hidden');
+      if (isRight) {
+        State.quizScore += 30;
+        fb.innerHTML = `✅ <b>Benar (+30 Poin)!</b> ${currentQuiz.exp}`;
+        showToast('🎉 Jawaban Tepat! +30 Poin');
+      } else {
+        fb.innerHTML = `💡 <b>Kurang Tepat.</b> ${currentQuiz.exp}`;
+        showToast('Perhatikan penjelasan ilmiah di kotak kuis!', 'warn');
+      }
+
+      const nextQBtn = document.getElementById('btn-next-quiz');
+      if (State.quizIdx < QUIZ_QUESTIONS.length - 1) {
+        nextQBtn.classList.remove('hidden');
+        nextQBtn.onclick = () => {
+          State.quizIdx++;
+          State.quizAnswered = false;
+          renderGalleryAndQuiz(State.gallerySelected, false);
+        };
+      } else {
+        nextQBtn.classList.remove('hidden');
+        nextQBtn.textContent = '🏆 Selesai Kuis';
+        nextQBtn.onclick = () => {
+          State.totalScore += State.quizScore;
+          State.quizScore = 0;
+          showToast(`🏆 Kuis selesai! Total skormu sekarang: ${State.totalScore} Poin!`);
+          renderGalleryAndQuiz(State.gallerySelected, false);
+        };
+      }
+    };
+  });
+}
+
+// Inisialisasi aplikasi saat halaman dimuat
+renderMenu();
+</script>
+</body>
+</html>
